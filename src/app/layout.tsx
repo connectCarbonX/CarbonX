@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CARBON-X — Track. Reduce. Save the Planet.",
+  title: "CARBON-X — Healing the Planet, One Bit at a Time.",
   description:
     "Your personal carbon footprint companion. Log eco-friendly actions, visualize your impact, earn rewards — and help heal the planet, one bit at a time.",
   keywords: ["carbon footprint", "sustainability", "climate", "eco tracker", "carbon-x"],
