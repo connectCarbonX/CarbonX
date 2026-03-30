@@ -17,6 +17,11 @@ export const metadata: Metadata = {
   description:
     "Your personal carbon footprint companion. Log eco-friendly actions, visualize your impact, earn rewards — and help heal the planet, one bit at a time.",
   keywords: ["carbon footprint", "sustainability", "climate", "eco tracker", "carbon-x"],
+  icons: {
+    icon: "/images/favicon.png",
+    shortcut: "/images/favicon.png",
+    apple: "/images/favicon.png",
+  },
   openGraph: {
     title: "CARBON-X — Track. Reduce. Save the Planet.",
     description:
