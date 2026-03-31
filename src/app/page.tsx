@@ -4,6 +4,11 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import {
+  EMPTY_SITE_CONSTANTS,
+  subscribeToSiteConstants,
+  type SiteConstants,
+} from '@/lib/site-constants';
+import {
   Leaf,
   Zap,
   TrendingUp,
@@ -115,21 +120,8 @@ function Navbar({
   const navItems = ['Features', 'X-Coin', 'How It Works', 'Impact'];
 
   return (
-    <header
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 100,
-        transition: 'all 0.3s ease',
-        background: scrolled || mobileMenuOpen ? 'var(--nav-surface-solid)' : 'transparent',
-        backdropFilter: scrolled || mobileMenuOpen ? 'blur(20px) saturate(1.2)' : 'none',
-        borderBottom: scrolled || mobileMenuOpen ? '1px solid var(--border-subtle)' : 'none',
-        boxShadow: scrolled || mobileMenuOpen ? 'var(--nav-shadow)' : 'none',
-      }}
-    >
-      <nav className='site-nav'>
+    <header className={`site-header ${scrolled || mobileMenuOpen ? 'site-header--floating' : ''}`}>
+      <nav className={`site-nav ${scrolled || mobileMenuOpen ? 'site-nav--floating' : ''}`}>
         <div className='site-nav__brand'>
           <Image src='/images/logo-v2.png' alt='CARBON-X' width={1225} height={835} style={{ height: 30, width: 'auto' }} />
           <span style={{ fontSize: 18, fontWeight: 700, letterSpacing: 1 }} className='text-gradient'>
@@ -146,7 +138,7 @@ function Navbar({
             ))}
           </div>
           <ThemeToggleButton theme={theme} onToggle={onToggleTheme} />
-          <a href='#beta' className='button-primary button-primary--compact'>
+          <a href='#beta' className='button-primary button-primary--compact site-nav__cta'>
             Beta Phase
           </a>
         </div>
@@ -660,14 +652,13 @@ function XCoin() {
   );
 }
 
-function Impact() {
+function Impact({ constants }: { constants: SiteConstants }) {
   const impacts = [
-    { icon: TreePine, value: '12,847', label: 'Trees equivalent CO₂ absorbed', color: '#4ade80' },
-    { icon: Droplets, value: '12+', label: 'Liters of water conserved', color: '#2dd4bf' },
-    { icon: Wind, value: '180+', label: 'km of car travel offset', color: '#22d3ee' },
+    { icon: Droplets, value: constants.liter, label: 'Liters of water conserved', color: '#2dd4bf' },
+    { icon: Wind, value: constants.km, label: 'km of car travel offset', color: '#22d3ee' },
     {
       icon: Leaf,
-      value: '150+',
+      value: constants.kg,
       label: (
         <>
           kg of CO<sub>2</sub> emissions saved in the last 1 week
@@ -677,7 +668,7 @@ function Impact() {
     },
   ];
 
-  const visibleImpacts = impacts.slice(1);
+  const visibleImpacts = impacts.filter((item) => item.value && item.value.trim().length > 0);
 
   return (
     <section id='impact' className='impact-section' style={{ padding: '120px 24px' }}>
@@ -706,7 +697,7 @@ function Impact() {
               >
                 <item.icon style={{ width: 36, height: 36, color: item.color, margin: '0 auto 20px' }} />
                 <div style={{ fontSize: 'clamp(36px, 5vw, 52px)', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: 8 }} className='text-gradient'>
-                  {item.value}
+                  {item.value || '—'}
                 </div>
                 <p style={{ fontSize: 14, color: 'var(--text-muted)', fontWeight: 500 }}>{item.label}</p>
               </div>
@@ -864,6 +855,7 @@ function Footer() {
 export default function Home() {
   const [theme, setTheme] = useState<ThemeMode>('light');
   const [themeReady, setThemeReady] = useState(false);
+  const [siteConstants, setSiteConstants] = useState<SiteConstants>(EMPTY_SITE_CONSTANTS);
 
   useEffect(() => {
     const savedTheme = window.localStorage.getItem('carbonx-theme');
@@ -887,6 +879,19 @@ export default function Home() {
     window.localStorage.setItem('carbonx-theme', theme);
   }, [theme, themeReady]);
 
+  useEffect(() => {
+    const unsubscribe = subscribeToSiteConstants(
+      (constants) => {
+        setSiteConstants(constants);
+      },
+      () => {
+        setSiteConstants(EMPTY_SITE_CONSTANTS);
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
+
   return (
     <>
       <div className='noise' />
@@ -899,7 +904,7 @@ export default function Home() {
         <div className='section-divider' />
         <HowItWorks />
         <div className='section-divider' />
-        <Impact />
+        <Impact constants={siteConstants} />
         <BetaPhase />
       </main>
       <Footer />
