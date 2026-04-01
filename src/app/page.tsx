@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
   EMPTY_SITE_CONSTANTS,
   subscribeToSiteConstants,
@@ -117,62 +117,164 @@ function Navbar({
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
-  const navItems = ['Features', 'X-Coin', 'How It Works', 'Impact'];
+  useEffect(() => {
+    if (!mobileMenuOpen) {
+      document.body.style.overflow = '';
+      return;
+    }
+
+    document.body.style.overflow = 'hidden';
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [mobileMenuOpen]);
+
+  const navItems = [
+    { label: 'Features', href: '#features', icon: Zap },
+    { label: 'X-Coin', href: '#x-coin', icon: Award },
+    { label: 'How It Works', href: '#how-it-works', icon: Check },
+    { label: 'Impact', href: '#impact', icon: Activity },
+  ] as const;
 
   return (
-    <header className={`site-header ${scrolled || mobileMenuOpen ? 'site-header--floating' : ''}`}>
-      <nav className={`site-nav ${scrolled || mobileMenuOpen ? 'site-nav--floating' : ''}`}>
-        <div className='site-nav__brand'>
-          <Image src='/images/logo-v2.png' alt='CARBON-X' width={1225} height={835} style={{ height: 30, width: 'auto' }} />
-          <span style={{ fontSize: 18, fontWeight: 700, letterSpacing: 1 }} className='text-gradient'>
-            CARBON-X
-          </span>
-        </div>
-
-        <div className='site-nav__desktop'>
-          <div className='site-nav__links'>
-            {navItems.map((item) => (
-              <a key={item} href={`#${item.toLowerCase().replace(/ /g, '-')}`} className='nav-link'>
-                {item}
-              </a>
-            ))}
+    <>
+      <header className={`site-header ${scrolled || mobileMenuOpen ? 'site-header--floating' : ''}`}>
+        <nav className={`site-nav ${scrolled || mobileMenuOpen ? 'site-nav--floating' : ''}`}>
+          <div className='site-nav__brand'>
+            <Image
+              src='/images/logo-v2.png'
+              alt='CARBON-X'
+              width={1225}
+              height={835}
+              className='site-nav__brand-logo'
+              style={{ height: 30, width: 'auto' }}
+            />
+            <span className='site-nav__brand-text text-gradient'>CARBON-X</span>
           </div>
-          <ThemeToggleButton theme={theme} onToggle={onToggleTheme} />
-          <a href='#beta' className='button-primary button-primary--compact site-nav__cta'>
-            Beta Phase
-          </a>
-        </div>
 
-        <div className='site-nav__controls'>
-          <ThemeToggleButton theme={theme} onToggle={onToggleTheme} />
-          <button
-            type='button'
-            className='site-nav__toggle'
-            aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
-            aria-expanded={mobileMenuOpen}
-            onClick={() => setMobileMenuOpen((open) => !open)}
-          >
-            {mobileMenuOpen ? <X style={{ width: 20, height: 20 }} /> : <Menu style={{ width: 20, height: 20 }} />}
-          </button>
-        </div>
-      </nav>
+          <div className='site-nav__desktop'>
+            <div className='site-nav__links'>
+              {navItems.map((item) => (
+                <a key={item.label} href={item.href} className='nav-link'>
+                  <item.icon style={{ width: 14, height: 14 }} />
+                  <span>{item.label}</span>
+                </a>
+              ))}
+            </div>
+            <ThemeToggleButton theme={theme} onToggle={onToggleTheme} />
+            <a href='#beta' className='button-primary button-primary--compact site-nav__cta'>
+              <Star style={{ width: 14, height: 14 }} />
+              <span>Beta Phase</span>
+            </a>
+          </div>
 
-      <div className={`site-nav__mobile ${mobileMenuOpen ? 'is-open' : ''}`}>
-        {navItems.map((item) => (
-          <a
-            key={item}
-            href={`#${item.toLowerCase().replace(/ /g, '-')}`}
-            className='site-nav__mobile-link'
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            {item}
-          </a>
-        ))}
-        <a href='#beta' className='site-nav__mobile-cta button-primary' onClick={() => setMobileMenuOpen(false)}>
-          Beta Phase
-        </a>
-      </div>
-    </header>
+          <div className='site-nav__controls'>
+            <ThemeToggleButton theme={theme} onToggle={onToggleTheme} />
+            <button
+              type='button'
+              className='site-nav__toggle'
+              aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+              aria-controls='site-mobile-menu'
+              aria-expanded={mobileMenuOpen}
+              onClick={() => setMobileMenuOpen((open) => !open)}
+            >
+              {mobileMenuOpen ? <X style={{ width: 20, height: 20 }} /> : <Menu style={{ width: 20, height: 20 }} />}
+            </button>
+          </div>
+        </nav>
+      </header>
+
+      <AnimatePresence>
+        {mobileMenuOpen ? (
+          <>
+            <motion.div
+              key='mobile-nav-backdrop'
+              className='site-nav__backdrop'
+              aria-hidden='true'
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.22, ease }}
+              onClick={() => setMobileMenuOpen(false)}
+            />
+
+            <motion.div
+              key='mobile-nav-modal'
+              id='site-mobile-menu'
+              className='site-nav__mobile-modal'
+              initial={{ opacity: 0, y: -18, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -12, scale: 0.98 }}
+              transition={{ duration: 0.28, ease }}
+            >
+              <motion.div
+                className='site-nav__mobile'
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                transition={{ duration: 0.22, delay: 0.04, ease }}
+              >
+                <div className='site-nav__mobile-header'>
+                  <div className='site-nav__mobile-title-group'>
+                    <span className='site-nav__mobile-eyebrow'>Navigation</span>
+                    <span className='site-nav__mobile-title'>Explore Carbon-X</span>
+                  </div>
+                  <button
+                    type='button'
+                    className='site-nav__mobile-close'
+                    aria-label='Close navigation menu'
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <X style={{ width: 18, height: 18 }} />
+                  </button>
+                </div>
+
+                <div className='site-nav__mobile-links'>
+                  {navItems.map((item, index) => (
+                    <motion.a
+                      key={item.label}
+                      href={item.href}
+                      className='site-nav__mobile-link'
+                      initial={{ opacity: 0, x: 18 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 12 }}
+                      transition={{ duration: 0.22, delay: 0.16 + index * 0.05, ease }}
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <item.icon style={{ width: 16, height: 16 }} />
+                      <span>{item.label}</span>
+                    </motion.a>
+                  ))}
+                </div>
+
+                <motion.a
+                  href='#beta'
+                  className='site-nav__mobile-cta button-primary'
+                  initial={{ opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 8 }}
+                  transition={{ duration: 0.24, delay: 0.36, ease }}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <Star style={{ width: 16, height: 16 }} />
+                  <span>Beta Phase</span>
+                </motion.a>
+              </motion.div>
+            </motion.div>
+          </>
+        ) : null}
+      </AnimatePresence>
+    </>
   );
 }
 
@@ -279,10 +381,13 @@ function Hero() {
           style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}
         >
           <a href='#beta' className='button-primary'>
-            Beta details <ArrowRight style={{ width: 18, height: 18 }} />
+            <Star style={{ width: 18, height: 18 }} />
+            <span>Beta details</span>
+            <ArrowRight style={{ width: 18, height: 18 }} />
           </a>
           <a href='#features' className='button-secondary'>
-            See features
+            <Zap style={{ width: 18, height: 18 }} />
+            <span>See features</span>
           </a>
         </motion.div>
 
@@ -653,6 +758,14 @@ function XCoin() {
 }
 
 function Impact({ constants }: { constants: SiteConstants }) {
+  const annualTreeAbsorptionKg = 21;
+  const kgValue = Number.parseFloat(constants.kg.replace(/,/g, ''));
+  const treeEquivalent = Number.isFinite(kgValue) ? kgValue / annualTreeAbsorptionKg : null;
+  const roundedTreeEquivalent = treeEquivalent !== null ? Math.max(1, Math.round(treeEquivalent)) : null;
+  const exactTreeEquivalent =
+    treeEquivalent !== null
+      ? new Intl.NumberFormat('en-IN', { maximumFractionDigits: 1 }).format(treeEquivalent)
+      : null;
   const impacts = [
     { icon: Droplets, value: constants.liter, label: 'Liters of water conserved', color: '#2dd4bf' },
     { icon: Wind, value: constants.km, label: 'km of car travel offset', color: '#22d3ee' },
@@ -703,8 +816,46 @@ function Impact({ constants }: { constants: SiteConstants }) {
               </div>
             </FadeIn>
           ))}
-        </div>
 
+          <FadeIn delay={visibleImpacts.length * 0.1} className='impact-grid__item impact-grid__item--full'>
+            <div
+              className='card impact-card impact-card--tree'
+              style={{
+                padding: '36px 32px',
+                boxShadow: '0 0 70px rgba(52, 211, 153, 0.12)',
+              }}
+            >
+              <div className='impact-card__tree-header'>
+                <div>
+                  <p className='impact-card__eyebrow'>Nature Equivalent</p>
+                  <h3 className='impact-card__title'>Equivalent trees planted</h3>
+                </div>
+                <div className='impact-card__tree-icon'>
+                  <TreePine style={{ width: 32, height: 32, color: '#34d399' }} />
+                </div>
+              </div>
+
+              <div className='impact-card__tree-body'>
+                <div>
+                  <div className='impact-card__tree-value text-gradient'>
+                    {roundedTreeEquivalent !== null ? roundedTreeEquivalent : '—'}
+                  </div>
+                  <p className='impact-card__tree-label'>Annual CO<sub>2</sub> absorption equivalent</p>
+                </div>
+
+                <div className='impact-card__tree-meta'>
+                  <p style={{ margin: 0 }}>
+                    Based on <strong>{constants.kg || '—'} kg CO<sub>2</sub></strong> saved and an estimate of{' '}
+                    <strong>21 kg per mature tree each year</strong>.
+                  </p>
+                  <p style={{ margin: 0, color: 'var(--text-primary)', fontWeight: 600 }}>
+                    {exactTreeEquivalent ? `≈ ${exactTreeEquivalent} trees per year equivalent` : 'Tree equivalent appears once CO2 data is available.'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </FadeIn>
+        </div>
       </div>
     </section>
   );
@@ -828,12 +979,12 @@ function Footer() {
               <span className='site-footer__link-text'>Instagram</span>
             </a>
             <a
-              href='mailto:carbonxarman@gmail.com'
+              href='mailto:connect.carbonx@outlook.com'
               className='site-footer__link-item'
               style={{ color: 'inherit', textDecoration: 'none' }}
             >
               <Mail style={{ width: 16, height: 16 }} />
-              <span className='site-footer__link-text'>carbonxarman@gmail.com</span>
+              <span className='site-footer__link-text'>connect.carbonx@outlook.com</span>
             </a>
           </div>
 

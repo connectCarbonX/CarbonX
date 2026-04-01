@@ -381,6 +381,7 @@ button:focus-visible {
   padding-top: 10px;
   display: flex;
   justify-content: center;
+  align-items: flex-start;
   transition: padding 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -397,6 +398,7 @@ button:focus-visible {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  min-height: 62px;
   border: 1px solid transparent;
   border-radius: 24px;
   transition:
@@ -426,7 +428,9 @@ button:focus-visible {
 .site-nav__brand {
   display: flex;
   align-items: center;
+  flex: 1;
   gap: 8px;
+  min-width: 0;
   transition:
     padding 0.45s cubic-bezier(0.22, 1, 0.36, 1),
     background 0.45s cubic-bezier(0.22, 1, 0.36, 1),
@@ -434,6 +438,19 @@ button:focus-visible {
     border-color 0.45s cubic-bezier(0.22, 1, 0.36, 1),
     border-radius 0.45s cubic-bezier(0.22, 1, 0.36, 1),
     transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.site-nav__brand-logo {
+  flex-shrink: 0;
+}
+
+.site-nav__brand-text {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .site-nav__desktop {
@@ -493,6 +510,10 @@ button:focus-visible {
 }
 
 .nav-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   color: var(--text-secondary);
   padding: 8px 12px;
   border-radius: 999px;
@@ -518,6 +539,14 @@ button:focus-visible {
   cursor: pointer;
 }
 
+.site-nav__backdrop {
+  display: none;
+}
+
+.site-nav__mobile-modal {
+  display: none;
+}
+
 .site-nav__mobile {
   display: none;
 }
@@ -527,10 +556,67 @@ button:focus-visible {
   text-decoration: none;
 }
 
+.site-nav__mobile-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.site-nav__mobile-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.site-nav__mobile-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-teal);
+}
+
+.site-nav__mobile-title {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+}
+
+.site-nav__mobile-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface-strong) 92%, transparent);
+  color: var(--text-primary);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.site-nav__mobile-close:hover {
+  border-color: var(--border-hover);
+  background: color-mix(in srgb, var(--surface-strong) 100%, transparent);
+}
+
+.site-nav__mobile-links {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .site-nav__mobile-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   color: var(--text-primary);
   font-size: 15px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .hero-section {
@@ -565,14 +651,19 @@ button:focus-visible {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 20px;
-  width: fit-content;
-  max-width: 100%;
+  width: 100%;
   margin: 0 auto;
-  justify-content: center;
+  align-items: stretch;
 }
 
 .impact-grid__item {
   height: 100%;
+  min-width: 0;
+}
+
+.impact-grid__item--full {
+  grid-column: 1 / -1;
+  width: 100%;
 }
 
 .impact-card {
@@ -580,6 +671,91 @@ button:focus-visible {
   display: flex;
   flex-direction: column;
   justify-content: center;
+}
+
+.impact-card--tree {
+  text-align: center;
+  gap: 28px;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
+.impact-card__tree-header,
+.impact-card__tree-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+
+.impact-card__tree-header {
+  margin-bottom: 4px;
+  flex-direction: column;
+}
+
+.impact-card__tree-body {
+  flex-direction: column;
+}
+
+.impact-card__eyebrow {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-teal);
+}
+
+.impact-card__title {
+  margin: 0;
+  font-size: clamp(24px, 3vw, 34px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+}
+
+.impact-card__tree-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 24px;
+  border: 1px solid color-mix(in srgb, var(--accent-green) 35%, transparent);
+  background: color-mix(in srgb, var(--accent-green) 14%, transparent);
+  flex-shrink: 0;
+}
+
+.impact-card__tree-value {
+  font-size: clamp(48px, 8vw, 80px);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.05em;
+}
+
+.impact-card__tree-label {
+  margin: 12px 0 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.impact-card__tree-body > div:first-child {
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+.impact-card__tree-meta {
+  flex: 1;
+  max-width: 760px;
+  display: grid;
+  gap: 12px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--text-muted);
+  justify-items: center;
+  text-align: center;
 }
 
 .beta-phase__list {
@@ -714,40 +890,94 @@ button:focus-visible {
     border-radius: 20px;
   }
 
+  .site-nav__brand {
+    gap: 6px;
+  }
+
+  .site-nav__brand-logo {
+    height: 26px !important;
+  }
+
+  .site-nav__brand-text {
+    font-size: 16px;
+    letter-spacing: 0.06em;
+  }
+
   .site-nav__desktop {
     display: none;
   }
 
   .site-nav__controls {
     display: flex;
+    flex-shrink: 0;
+    gap: 8px;
   }
 
   .site-nav__toggle {
     display: inline-flex;
     flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+  }
+
+  .site-nav__controls .theme-toggle {
+    width: 40px;
+    height: 40px;
+  }
+
+  .site-nav__backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 120;
+    background: rgba(7, 15, 12, 0.18);
+  }
+
+  .site-nav__mobile-modal {
+    display: flex;
+    position: fixed;
+    inset: 0;
+    z-index: 130;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 82px 16px 18px;
+    background:
+      radial-gradient(circle at top right, color-mix(in srgb, var(--accent-green) 18%, transparent), transparent 36%),
+      radial-gradient(circle at top left, color-mix(in srgb, var(--accent-gold) 12%, transparent), transparent 32%),
+      color-mix(in srgb, var(--nav-surface-solid) 92%, transparent);
   }
 
   .site-nav__mobile {
-    display: none;
-    padding: 0 16px 16px;
-  }
-
-  .site-nav__mobile.is-open {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 22px;
+    width: min(100%, 420px);
+    max-height: calc(100dvh - 100px);
+    overflow-y: auto;
+    padding: 22px;
+    border: 1px solid color-mix(in srgb, var(--border-subtle) 120%, transparent);
+    border-radius: 32px;
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--surface-strong) 96%, transparent), color-mix(in srgb, var(--nav-surface-solid) 88%, transparent));
+    box-shadow:
+      0 34px 70px rgba(14, 26, 20, 0.18),
+      inset 0 1px 0 color-mix(in srgb, white 46%, transparent);
   }
 
   .site-nav__mobile-link,
   .site-nav__mobile-cta {
     width: 100%;
-    padding: 14px 16px;
-    border-radius: 18px;
+    padding: 16px 18px;
+    border-radius: 20px;
   }
 
   .site-nav__mobile-link {
-    background: color-mix(in srgb, var(--surface-strong) 92%, transparent);
-    border: 1px solid var(--border-subtle);
+    display: flex;
+    align-items: center;
+    min-height: 58px;
+    background: color-mix(in srgb, var(--surface-strong) 94%, transparent);
+    border: 1px solid color-mix(in srgb, var(--border-subtle) 115%, transparent);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, white 42%, transparent);
   }
 
   .site-nav__mobile-cta {
@@ -777,6 +1007,22 @@ button:focus-visible {
 
   .impact-grid {
     grid-template-columns: 1fr;
+  }
+
+  .impact-card__tree-header,
+  .impact-card__tree-body {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .impact-card__tree-body > div:first-child {
+    min-width: 0;
+  }
+
+  .impact-card__tree-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 20px;
   }
 
   .beta-phase__title {
@@ -865,6 +1111,34 @@ button:focus-visible {
 }
 
 @media (max-width: 479px) {
+  .site-nav,
+  .site-nav--floating {
+    width: calc(100% - 12px);
+  }
+
+  .site-nav {
+    padding: 10px 12px;
+  }
+
+  .site-nav__brand-text {
+    font-size: 13px;
+    letter-spacing: 0.04em;
+  }
+
+  .site-nav__mobile {
+    width: 100%;
+    padding: 20px 18px;
+    border-radius: 28px;
+  }
+
+  .site-nav__mobile-modal {
+    padding: 76px 12px 12px;
+  }
+
+  .site-nav__mobile-title {
+    font-size: 21px;
+  }
+
   .social-proof-grid {
     grid-template-columns: 1fr;
   }

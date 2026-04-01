@@ -1,7 +1,7 @@
 'use client';
 
 import { FormEvent, useEffect, useState } from 'react';
-import { Database, LogIn, LogOut, Save, Shield } from 'lucide-react';
+import { LogIn, LogOut, Save, Shield } from 'lucide-react';
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut, type User } from 'firebase/auth';
 import { doc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
@@ -330,22 +330,6 @@ export default function CmsAdminPage() {
                     />
                   </label>
                 ))}
-              </div>
-
-              <div
-                style={{
-                  padding: 14,
-                  borderRadius: 14,
-                  background: 'rgba(20, 184, 166, 0.1)',
-                  border: '1px solid rgba(45, 212, 191, 0.18)',
-                  color: '#ccfbf1',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
-                }}
-              >
-                <Database size={18} />
-                <span>Fetched from and saved into Firestore collection: `constant`</span>
               </div>
 
               <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
