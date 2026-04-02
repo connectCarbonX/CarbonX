@@ -955,38 +955,35 @@ function Impact({ constants }: { constants: SiteConstants }) {
         </FadeIn>
 
         <div className='impact-orbit'>
-          {visibleImpacts.map((item, i) => (
-            <FadeIn
-              key={item.id}
-              delay={i * 0.1}
-              className={`impact-orbit__item impact-orbit__item--${item.id}`}
-            >
-              <div
-                className='card impact-card impact-card--orbit'
-                style={{
-                  boxShadow: `0 30px 80px ${item.color}18`,
-                }}
-              >
+          <div className='impact-orbit__cluster'>
+            {visibleImpacts.map((item) => (
+              <div key={item.id} className={`impact-orbit__item impact-orbit__item--${item.id}`}>
                 <div
-                  className='impact-card__icon-shell'
+                  className='card impact-card impact-card--orbit'
                   style={{
-                    color: item.color,
-                    borderColor: `${item.color}40`,
-                    background: `linear-gradient(180deg, ${item.color}1f 0%, ${item.color}0d 100%)`,
+                    boxShadow: `0 30px 80px ${item.color}18`,
                   }}
                 >
-                  <item.icon style={{ width: 28, height: 28 }} />
+                  <div
+                    className='impact-card__icon-shell'
+                    style={{
+                      color: item.color,
+                      borderColor: `${item.color}40`,
+                      background: `linear-gradient(180deg, ${item.color}1f 0%, ${item.color}0d 100%)`,
+                    }}
+                  >
+                    <item.icon style={{ width: 28, height: 28 }} />
+                  </div>
+                  <p className='impact-card__kicker'>Live impact</p>
+                  <div className='impact-card__value text-gradient'>
+                    <AnimatedCount value={item.value} start={hasTriggeredCountUp} />
+                  </div>
+                  <p className='impact-card__label'>{item.label}</p>
                 </div>
-                <p className='impact-card__kicker'>Live impact</p>
-                <div className='impact-card__value text-gradient'>
-                  <AnimatedCount value={item.value} start={hasTriggeredCountUp} />
-                </div>
-                <p className='impact-card__label'>{item.label}</p>
               </div>
-            </FadeIn>
-          ))}
-
-          <FadeIn delay={visibleImpacts.length * 0.1} className='impact-orbit__center'>
+            ))}
+          </div>
+          <div className='impact-orbit__main'>
             <div
               className='card impact-card impact-card--tree impact-card--tree-orbit'
               style={{
@@ -1022,7 +1019,7 @@ function Impact({ constants }: { constants: SiteConstants }) {
                 </div>
               </div>
             </div>
-          </FadeIn>
+          </div>
         </div>
       </div>
     </section>

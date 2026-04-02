@@ -674,68 +674,60 @@ button:focus-visible {
 }
 
 .impact-orbit {
-  --impact-orbit-radius: clamp(380px, 23vw, 460px);
   --impact-orbit-card-size: clamp(250px, 17.5vw, 295px);
   --impact-orbit-icon-size: 72px;
   display: grid;
-  place-items: center;
-  position: relative;
+  grid-template-columns: minmax(320px, 1.08fr) minmax(320px, 0.92fr);
+  align-items: center;
+  gap: clamp(28px, 4vw, 64px);
   width: 100%;
-  max-width: 1480px;
+  max-width: 1320px;
   margin: 0 auto;
-  padding-top: clamp(250px, 18vw, 340px);
-  padding-bottom: clamp(140px, 10vw, 210px);
-  overflow: visible;
 }
 
-.impact-orbit__item,
-.impact-orbit__center {
-  grid-area: 1 / 1;
+.impact-orbit__main {
+  grid-column: 1;
+  grid-row: 1;
+  display: flex;
+  justify-content: flex-start;
+  min-width: 0;
+}
+
+.impact-orbit__cluster {
+  grid-column: 2;
+  grid-row: 1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-areas:
+    "top top"
+    "left right";
+  justify-items: center;
+  align-items: end;
+  justify-self: end;
+  gap: clamp(18px, 2vw, 28px);
+  min-width: 0;
+}
+
+.impact-orbit__item {
   display: flex;
   justify-content: center;
-  width: auto;
+  width: 100%;
 }
 
 .impact-orbit__item--top {
-  --impact-angle: 0deg;
-  z-index: 3;
-  animation: impact-orbit-spin 26s linear infinite;
+  grid-area: top;
 }
 
 .impact-orbit__item--left {
-  --impact-angle: -120deg;
-  z-index: 3;
-  animation: impact-orbit-spin 26s linear infinite;
+  grid-area: left;
 }
 
 .impact-orbit__item--right {
-  --impact-angle: 120deg;
-  z-index: 3;
-  animation: impact-orbit-spin 26s linear infinite;
-}
-
-.impact-orbit__center {
-  z-index: 2;
-}
-
-.impact-orbit::before {
-  display: none;
-}
-
-@keyframes impact-orbit-spin {
-  from {
-    transform: rotate(var(--impact-angle)) translateY(calc(-1 * var(--impact-orbit-radius)))
-      rotate(calc(-1 * var(--impact-angle)));
-  }
-
-  to {
-    transform: rotate(calc(var(--impact-angle) + 1turn)) translateY(calc(-1 * var(--impact-orbit-radius)))
-      rotate(calc(-1 * var(--impact-angle) - 1turn));
-  }
+  grid-area: right;
 }
 
 .impact-card--orbit {
-  width: var(--impact-orbit-card-size);
+  width: min(100%, var(--impact-orbit-card-size));
   max-width: 100%;
   aspect-ratio: 1 / 1;
   height: auto;
@@ -786,14 +778,14 @@ button:focus-visible {
 .impact-card--tree {
   text-align: center;
   gap: 18px;
-  width: clamp(430px, 31vw, 560px);
+  width: min(100%, clamp(430px, 31vw, 560px));
   aspect-ratio: 1 / 1;
   height: auto;
   padding: clamp(34px, 3vw, 52px);
   box-sizing: border-box;
   border-radius: 50%;
   overflow: hidden;
-  margin: 0 auto;
+  margin: 0;
   justify-content: center;
   align-items: center;
 }
@@ -986,53 +978,25 @@ button:focus-visible {
   }
 
   .impact-orbit {
-    --impact-orbit-radius: initial;
     --impact-orbit-card-size: min(100%, 270px);
     --impact-orbit-icon-size: 68px;
-    grid-template-columns: repeat(2, minmax(180px, 1fr));
-    grid-template-areas:
-      "top left"
-      "center center"
-      ". right";
-    place-items: initial;
-    justify-items: center;
-    align-items: center;
-    gap: 56px 24px;
-    max-width: 1120px;
-    padding-top: 0;
-    padding-bottom: 0;
+    grid-template-columns: 1fr;
+    gap: 36px;
+    max-width: 760px;
   }
 
-  .impact-orbit::before {
-    display: none;
+  .impact-orbit__main {
+    grid-column: auto;
+    grid-row: auto;
+    justify-content: center;
   }
 
-  .impact-orbit__item,
-  .impact-orbit__center {
+  .impact-orbit__cluster {
+    grid-column: auto;
+    grid-row: auto;
     width: 100%;
-  }
-
-  .impact-orbit__item--top {
-    grid-area: top;
-    animation: none;
-    transform: none;
-  }
-
-  .impact-orbit__item--left {
-    grid-area: left;
-    animation: none;
-    transform: none;
-  }
-
-  .impact-orbit__item--right {
-    grid-area: right;
-    animation: none;
-    transform: none;
-  }
-
-  .impact-orbit__center {
-    grid-area: center;
-    transform: none;
+    max-width: 620px;
+    margin: 0 auto;
   }
 
   .impact-card--orbit {
@@ -1190,13 +1154,15 @@ button:focus-visible {
   .impact-orbit {
     --impact-orbit-card-size: min(100%, 255px);
     --impact-orbit-icon-size: 64px;
+    gap: 24px;
+  }
+
+  .impact-orbit__cluster {
     grid-template-columns: 1fr;
     grid-template-areas:
       "top"
       "left"
-      "right"
-      "center";
-    place-items: initial;
+      "right";
     gap: 20px;
   }
 
