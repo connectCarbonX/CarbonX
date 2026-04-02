@@ -397,7 +397,7 @@ button:focus-visible {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 5px;
   min-height: 62px;
   border: 1px solid transparent;
   border-radius: 24px;
@@ -560,7 +560,7 @@ button:focus-visible {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
+  gap: 5px;
 }
 
 .site-nav__mobile-title-group {
@@ -999,7 +999,7 @@ button:focus-visible {
   .impact-orbit {
     --impact-orbit-icon-size: 68px;
     grid-template-columns: 1fr;
-    gap: 12px;
+    gap: 5px;
     max-width: 760px;
   }
 
@@ -1182,7 +1182,7 @@ button:focus-visible {
 
   .impact-orbit {
     --impact-orbit-icon-size: 64px;
-    gap: 10px;
+    gap: 5px;
   }
 
   .impact-orbit__cluster {
@@ -1191,7 +1191,7 @@ button:focus-visible {
       "top"
       "left"
       "right";
-    gap: 10px;
+    gap: 5px;
   }
 
   .impact-card--orbit {
