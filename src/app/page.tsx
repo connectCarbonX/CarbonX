@@ -101,7 +101,7 @@ function formatCountValue(target: CountTarget, nextValue: number) {
 function AnimatedCount({
   value,
   start,
-  duration = 1600,
+  duration = 2500,
 }: {
   value: string | number | null;
   start: boolean;
