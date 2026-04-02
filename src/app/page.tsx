@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
@@ -41,6 +41,122 @@ import {
 
 const ease = [0.16, 1, 0.3, 1] as const;
 type ThemeMode = 'light' | 'dark';
+
+type CountTarget = {
+  prefix: string;
+  suffix: string;
+  value: number;
+  decimals: number;
+};
+
+function parseCountTarget(value: string | number | null) {
+  if (typeof value === 'number') {
+    if (!Number.isFinite(value)) {
+      return null;
+    }
+
+    return {
+      prefix: '',
+      suffix: '',
+      value,
+      decimals: Number.isInteger(value) ? 0 : 1,
+    } satisfies CountTarget;
+  }
+
+  if (!value) {
+    return null;
+  }
+
+  const match = value.trim().match(/^([^0-9-]*)(-?\d[\d,]*(?:\.\d+)?)(.*)$/);
+
+  if (!match) {
+    return null;
+  }
+
+  const [, prefix, numericPart, suffix] = match;
+  const parsedValue = Number.parseFloat(numericPart.replace(/,/g, ''));
+
+  if (!Number.isFinite(parsedValue)) {
+    return null;
+  }
+
+  return {
+    prefix,
+    suffix,
+    value: parsedValue,
+    decimals: numericPart.includes('.') ? numericPart.split('.')[1]?.length ?? 0 : 0,
+  } satisfies CountTarget;
+}
+
+function formatCountValue(target: CountTarget, nextValue: number) {
+  const safeValue = target.decimals === 0 ? Math.round(nextValue) : nextValue;
+  const formattedValue = new Intl.NumberFormat('en-IN', {
+    minimumFractionDigits: target.decimals,
+    maximumFractionDigits: target.decimals,
+  }).format(safeValue);
+
+  return `${target.prefix}${formattedValue}${target.suffix}`;
+}
+
+function AnimatedCount({
+  value,
+  start,
+  duration = 1600,
+}: {
+  value: string | number | null;
+  start: boolean;
+  duration?: number;
+}) {
+  const [displayValue, setDisplayValue] = useState(() => {
+    const target = parseCountTarget(value);
+
+    if (!target) {
+      return value ? String(value) : '—';
+    }
+
+    return formatCountValue(target, start ? target.value : 0);
+  });
+
+  useEffect(() => {
+    const target = parseCountTarget(value);
+
+    if (!target) {
+      setDisplayValue(value ? String(value) : '—');
+      return;
+    }
+
+    if (!start) {
+      setDisplayValue(formatCountValue(target, 0));
+      return;
+    }
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setDisplayValue(formatCountValue(target, target.value));
+      return;
+    }
+
+    let animationFrame = 0;
+    const animationStart = performance.now();
+
+    const tick = (now: number) => {
+      const progress = Math.min((now - animationStart) / duration, 1);
+      const easedProgress = 1 - Math.pow(1 - progress, 3);
+      const nextValue = target.value * easedProgress;
+
+      setDisplayValue(formatCountValue(target, progress >= 1 ? target.value : nextValue));
+
+      if (progress < 1) {
+        animationFrame = window.requestAnimationFrame(tick);
+      }
+    };
+
+    animationFrame = window.requestAnimationFrame(tick);
+
+    return () => window.cancelAnimationFrame(animationFrame);
+  }, [duration, start, value]);
+
+  return <>{displayValue}</>;
+}
 
 function FadeIn({
   children,
@@ -758,6 +874,8 @@ function XCoin() {
 }
 
 function Impact({ constants }: { constants: SiteConstants }) {
+  const impactSectionRef = useRef<HTMLElement | null>(null);
+  const [hasTriggeredCountUp, setHasTriggeredCountUp] = useState(false);
   const annualTreeAbsorptionKg = 21;
   const kgValue = Number.parseFloat(constants.kg.replace(/,/g, ''));
   const treeEquivalent = Number.isFinite(kgValue) ? kgValue / annualTreeAbsorptionKg : null;
@@ -783,8 +901,34 @@ function Impact({ constants }: { constants: SiteConstants }) {
 
   const visibleImpacts = impacts.filter((item) => item.value && item.value.trim().length > 0);
 
+  useEffect(() => {
+    const section = impactSectionRef.current;
+
+    if (!section || hasTriggeredCountUp) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting) {
+          return;
+        }
+
+        setHasTriggeredCountUp(true);
+        observer.disconnect();
+      },
+      {
+        threshold: 0.35,
+      }
+    );
+
+    observer.observe(section);
+
+    return () => observer.disconnect();
+  }, [hasTriggeredCountUp]);
+
   return (
-    <section id='impact' className='impact-section' style={{ padding: '120px 24px' }}>
+    <section ref={impactSectionRef} id='impact' className='impact-section' style={{ padding: '120px 24px' }}>
       <div className='impact-section__inner'>
         <FadeIn>
           <div style={{ textAlign: 'center', marginBottom: 64 }}>
@@ -810,7 +954,7 @@ function Impact({ constants }: { constants: SiteConstants }) {
               >
                 <item.icon style={{ width: 36, height: 36, color: item.color, margin: '0 auto 20px' }} />
                 <div style={{ fontSize: 'clamp(36px, 5vw, 52px)', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: 8 }} className='text-gradient'>
-                  {item.value || '—'}
+                  <AnimatedCount value={item.value} start={hasTriggeredCountUp} />
                 </div>
                 <p style={{ fontSize: 14, color: 'var(--text-muted)', fontWeight: 500 }}>{item.label}</p>
               </div>
@@ -838,7 +982,7 @@ function Impact({ constants }: { constants: SiteConstants }) {
               <div className='impact-card__tree-body'>
                 <div>
                   <div className='impact-card__tree-value text-gradient'>
-                    {roundedTreeEquivalent !== null ? roundedTreeEquivalent : '—'}
+                    <AnimatedCount value={roundedTreeEquivalent} start={hasTriggeredCountUp} />
                   </div>
                   <p className='impact-card__tree-label'>Annual CO<sub>2</sub> absorption equivalent</p>
                 </div>
