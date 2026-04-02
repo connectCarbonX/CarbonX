@@ -885,9 +885,8 @@ function Impact({ constants }: { constants: SiteConstants }) {
       ? new Intl.NumberFormat('en-IN', { maximumFractionDigits: 1 }).format(treeEquivalent)
       : null;
   const impacts = [
-    { icon: Droplets, value: constants.liter, label: 'Liters of water conserved', color: '#2dd4bf' },
-    { icon: Wind, value: constants.km, label: 'km of car travel offset', color: '#22d3ee' },
     {
+      id: 'top',
       icon: Leaf,
       value: constants.kg,
       label: (
@@ -896,6 +895,20 @@ function Impact({ constants }: { constants: SiteConstants }) {
         </>
       ),
       color: '#34d399',
+    },
+    {
+      id: 'left',
+      icon: Droplets,
+      value: constants.liter,
+      label: 'Liters of water conserved',
+      color: '#2dd4bf',
+    },
+    {
+      id: 'right',
+      icon: Wind,
+      value: constants.km,
+      label: 'km of car travel offset',
+      color: '#22d3ee',
     },
   ];
 
@@ -941,32 +954,43 @@ function Impact({ constants }: { constants: SiteConstants }) {
           </div>
         </FadeIn>
 
-        <div className='impact-grid'>
+        <div className='impact-orbit'>
           {visibleImpacts.map((item, i) => (
-            <FadeIn key={item.value} delay={i * 0.1} className='impact-grid__item'>
+            <FadeIn
+              key={item.id}
+              delay={i * 0.1}
+              className={`impact-orbit__item impact-orbit__item--${item.id}`}
+            >
               <div
-                className='card impact-card'
+                className='card impact-card impact-card--orbit'
                 style={{
-                  padding: '48px 32px',
-                  textAlign: 'center',
-                  boxShadow: `0 0 60px ${item.color}08`,
+                  boxShadow: `0 30px 80px ${item.color}18`,
                 }}
               >
-                <item.icon style={{ width: 36, height: 36, color: item.color, margin: '0 auto 20px' }} />
-                <div style={{ fontSize: 'clamp(36px, 5vw, 52px)', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: 8 }} className='text-gradient'>
+                <div
+                  className='impact-card__icon-shell'
+                  style={{
+                    color: item.color,
+                    borderColor: `${item.color}40`,
+                    background: `linear-gradient(180deg, ${item.color}1f 0%, ${item.color}0d 100%)`,
+                  }}
+                >
+                  <item.icon style={{ width: 28, height: 28 }} />
+                </div>
+                <p className='impact-card__kicker'>Live impact</p>
+                <div className='impact-card__value text-gradient'>
                   <AnimatedCount value={item.value} start={hasTriggeredCountUp} />
                 </div>
-                <p style={{ fontSize: 14, color: 'var(--text-muted)', fontWeight: 500 }}>{item.label}</p>
+                <p className='impact-card__label'>{item.label}</p>
               </div>
             </FadeIn>
           ))}
 
-          <FadeIn delay={visibleImpacts.length * 0.1} className='impact-grid__item impact-grid__item--full'>
+          <FadeIn delay={visibleImpacts.length * 0.1} className='impact-orbit__center'>
             <div
-              className='card impact-card impact-card--tree'
+              className='card impact-card impact-card--tree impact-card--tree-orbit'
               style={{
-                padding: '36px 32px',
-                boxShadow: '0 0 70px rgba(52, 211, 153, 0.12)',
+                boxShadow: '0 40px 120px rgba(52, 211, 153, 0.18)',
               }}
             >
               <div className='impact-card__tree-header'>

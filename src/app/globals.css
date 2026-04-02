@@ -673,24 +673,142 @@ button:focus-visible {
   justify-content: center;
 }
 
+.impact-orbit {
+  --impact-orbit-radius: clamp(380px, 23vw, 460px);
+  --impact-orbit-card-size: clamp(250px, 17.5vw, 295px);
+  --impact-orbit-icon-size: 72px;
+  display: grid;
+  place-items: center;
+  position: relative;
+  width: 100%;
+  max-width: 1480px;
+  margin: 0 auto;
+  padding-top: clamp(250px, 18vw, 340px);
+  padding-bottom: clamp(140px, 10vw, 210px);
+  overflow: visible;
+}
+
+.impact-orbit__item,
+.impact-orbit__center {
+  grid-area: 1 / 1;
+  display: flex;
+  justify-content: center;
+  width: auto;
+}
+
+.impact-orbit__item--top {
+  --impact-angle: 0deg;
+  z-index: 3;
+  animation: impact-orbit-spin 26s linear infinite;
+}
+
+.impact-orbit__item--left {
+  --impact-angle: -120deg;
+  z-index: 3;
+  animation: impact-orbit-spin 26s linear infinite;
+}
+
+.impact-orbit__item--right {
+  --impact-angle: 120deg;
+  z-index: 3;
+  animation: impact-orbit-spin 26s linear infinite;
+}
+
+.impact-orbit__center {
+  z-index: 2;
+}
+
+.impact-orbit::before {
+  display: none;
+}
+
+@keyframes impact-orbit-spin {
+  from {
+    transform: rotate(var(--impact-angle)) translateY(calc(-1 * var(--impact-orbit-radius)))
+      rotate(calc(-1 * var(--impact-angle)));
+  }
+
+  to {
+    transform: rotate(calc(var(--impact-angle) + 1turn)) translateY(calc(-1 * var(--impact-orbit-radius)))
+      rotate(calc(-1 * var(--impact-angle) - 1turn));
+  }
+}
+
+.impact-card--orbit {
+  width: var(--impact-orbit-card-size);
+  max-width: 100%;
+  aspect-ratio: 1 / 1;
+  height: auto;
+  padding: clamp(34px, 2.4vw, 40px);
+  box-sizing: border-box;
+  border-radius: 50%;
+  overflow: hidden;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+}
+
+.impact-card__icon-shell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--impact-orbit-icon-size);
+  height: var(--impact-orbit-icon-size);
+  border-radius: 999px;
+  border: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+
+.impact-card__kicker {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.impact-card__value {
+  font-size: clamp(30px, 3.3vw, 44px);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.impact-card__label {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  max-width: 200px;
+}
+
 .impact-card--tree {
   text-align: center;
-  gap: 28px;
-  width: 100%;
+  gap: 18px;
+  width: clamp(430px, 31vw, 560px);
+  aspect-ratio: 1 / 1;
+  height: auto;
+  padding: clamp(34px, 3vw, 52px);
+  box-sizing: border-box;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 0 auto;
   justify-content: center;
   align-items: center;
 }
 
 .impact-card__tree-header,
 .impact-card__tree-body {
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 24px;
+  gap: 16px;
 }
 
 .impact-card__tree-header {
-  margin-bottom: 4px;
+  margin-bottom: 0;
   flex-direction: column;
 }
 
@@ -709,10 +827,11 @@ button:focus-visible {
 
 .impact-card__title {
   margin: 0;
-  font-size: clamp(24px, 3vw, 34px);
+  font-size: clamp(18px, 2.2vw, 28px);
   font-weight: 800;
   letter-spacing: -0.03em;
   color: var(--text-primary);
+  line-height: 1.1;
 }
 
 .impact-card__tree-icon {
@@ -728,17 +847,18 @@ button:focus-visible {
 }
 
 .impact-card__tree-value {
-  font-size: clamp(48px, 8vw, 80px);
+  font-size: clamp(46px, 6vw, 72px);
   font-weight: 800;
   line-height: 0.95;
   letter-spacing: -0.05em;
 }
 
 .impact-card__tree-label {
-  margin: 12px 0 0;
-  font-size: 15px;
+  margin: 8px 0 0;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text-muted);
+  line-height: 1.35;
 }
 
 .impact-card__tree-body > div:first-child {
@@ -747,12 +867,12 @@ button:focus-visible {
 }
 
 .impact-card__tree-meta {
-  flex: 1;
-  max-width: 760px;
+  width: 100%;
+  max-width: 300px;
   display: grid;
-  gap: 12px;
-  font-size: 15px;
-  line-height: 1.7;
+  gap: 8px;
+  font-size: 13px;
+  line-height: 1.45;
   color: var(--text-muted);
   justify-items: center;
   text-align: center;
@@ -863,6 +983,64 @@ button:focus-visible {
 
   .impact-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .impact-orbit {
+    --impact-orbit-radius: initial;
+    --impact-orbit-card-size: min(100%, 270px);
+    --impact-orbit-icon-size: 68px;
+    grid-template-columns: repeat(2, minmax(180px, 1fr));
+    grid-template-areas:
+      "top left"
+      "center center"
+      ". right";
+    place-items: initial;
+    justify-items: center;
+    align-items: center;
+    gap: 56px 24px;
+    max-width: 1120px;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .impact-orbit::before {
+    display: none;
+  }
+
+  .impact-orbit__item,
+  .impact-orbit__center {
+    width: 100%;
+  }
+
+  .impact-orbit__item--top {
+    grid-area: top;
+    animation: none;
+    transform: none;
+  }
+
+  .impact-orbit__item--left {
+    grid-area: left;
+    animation: none;
+    transform: none;
+  }
+
+  .impact-orbit__item--right {
+    grid-area: right;
+    animation: none;
+    transform: none;
+  }
+
+  .impact-orbit__center {
+    grid-area: center;
+    transform: none;
+  }
+
+  .impact-card--orbit {
+    max-width: 100%;
+  }
+
+  .impact-card--tree {
+    width: min(100%, 520px);
   }
 }
 
@@ -1009,14 +1187,36 @@ button:focus-visible {
     grid-template-columns: 1fr;
   }
 
+  .impact-orbit {
+    --impact-orbit-card-size: min(100%, 255px);
+    --impact-orbit-icon-size: 64px;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "top"
+      "left"
+      "right"
+      "center";
+    place-items: initial;
+    gap: 20px;
+  }
+
+  .impact-card--orbit {
+    padding: 36px 28px;
+  }
+
   .impact-card__tree-header,
   .impact-card__tree-body {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
   }
 
   .impact-card__tree-body > div:first-child {
     min-width: 0;
+  }
+
+  .impact-card--tree {
+    width: min(100%, 420px);
+    padding: 28px 20px;
   }
 
   .impact-card__tree-icon {
@@ -1159,5 +1359,11 @@ button:focus-visible {
     animation: none !important;
     transition-duration: 0.01ms !important;
     transition-delay: 0ms !important;
+  }
+
+  .impact-orbit__item--top,
+  .impact-orbit__item--left,
+  .impact-orbit__item--right {
+    transform: none !important;
   }
 }
