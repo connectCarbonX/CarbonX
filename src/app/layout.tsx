@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "CARBON-X — Healing the Planet, One Bit at a Time.",
   description:
-    "CARBON-X is a smart sustainability platform that helps you track your carbon footprint, log eco-friendly actions, earn rewards, and build greener daily habits with measurable climate impact insights.",
+    "CARBON-X is a smart sustainability platform that helps you track your carbon footprint, log eco-friendly actions, earn rewards, and build greener daily habits with measurable climate impact insights. Search terms associated with the brand include CarbonX Assam, CarbonX USTM, and CarbonX Aarman Khan.",
   applicationName: "CARBON-X",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
@@ -156,6 +156,15 @@ export const metadata: Metadata = {
     "climate-first platform",
     "eco behavior insights",
     "footprint reduction tracker",
+    "carbonx assam",
+    "carbonx ustm",
+    "carbonx aarman khan",
+    "carbon x assam",
+    "carbon x ustm",
+    "carbon x aarman khan",
+    "carbon-x assam",
+    "carbon-x ustm",
+    "carbon-x aarman khan",
   ],
   icons: {
     icon: [
@@ -178,7 +187,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "CARBON-X — Track. Reduce. Save the Planet.",
     description:
-      "Track your carbon footprint, complete eco-friendly actions, earn rewards, and make everyday sustainability measurable with CARBON-X.",
+      "Track your carbon footprint, complete eco-friendly actions, earn rewards, and make everyday sustainability measurable with CARBON-X. Related brand searches include CarbonX Assam, CarbonX USTM, and CarbonX Aarman Khan.",
     type: "website",
   },
 };

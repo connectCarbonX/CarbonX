@@ -679,7 +679,7 @@ button:focus-visible {
   display: grid;
   grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
   align-items: stretch;
-  gap: 12px;
+  gap: 5px;
   width: 100%;
   max-width: 100%;
   margin: 0 auto;
@@ -705,7 +705,7 @@ button:focus-visible {
   justify-items: stretch;
   align-items: stretch;
   justify-self: stretch;
-  gap: 12px;
+  gap: 5px;
   min-width: 0;
 }
 
@@ -730,8 +730,8 @@ button:focus-visible {
 .impact-card--orbit {
   width: 100%;
   max-width: none;
-  min-height: clamp(220px, 24vw, 320px);
-  padding: clamp(34px, 2.4vw, 40px);
+  min-height: clamp(200px, 22vw, 290px);
+  padding: clamp(30px, 2.1vw, 36px);
   box-sizing: border-box;
   border-radius: 32px;
   overflow: hidden;
@@ -741,7 +741,7 @@ button:focus-visible {
 }
 
 .impact-orbit__item--top .impact-card--orbit {
-  min-height: clamp(180px, 18vw, 240px);
+  min-height: clamp(160px, 15vw, 215px);
 }
 
 .impact-card__icon-shell {
@@ -784,7 +784,7 @@ button:focus-visible {
   gap: 18px;
   width: 100%;
   min-height: 100%;
-  padding: clamp(34px, 3vw, 52px);
+  padding: clamp(30px, 2.6vw, 46px);
   box-sizing: border-box;
   border-radius: 40px;
   overflow: hidden;
