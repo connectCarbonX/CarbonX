@@ -202,6 +202,18 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <video
+          className="site-background__video"
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
+          aria-hidden="true"
+        >
+          <source src="/images/bg.mp4" type="video/mp4" />
+        </video>
+        <div className="site-background__overlay" aria-hidden="true" />
         {children}
       </body>
     </html>

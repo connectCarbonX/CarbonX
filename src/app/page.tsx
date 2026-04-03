@@ -1427,7 +1427,7 @@ const leadershipProfiles = [
     role: 'Lead Web Developer',
     name: 'Abishrant Shandilya',
     image:
-      'https://media.licdn.com/dms/image/v2/D5603AQEZXB0OfBsLJA/profile-displayphoto-scale_400_400/B56Z0mZ8OnHIAg-/0/1774465832003?e=1776902400&v=beta&t=xOb1cEAdhUq5cQx43rvaPCGXo_48lJVesMBc8EZpBgc',
+      'https://media.licdn.com/dms/image/v2/D5603AQHiEx2WFw2pwA/profile-displayphoto-scale_400_400/B56Z1UxWy9KsAg-/0/1775243724580?e=1776902400&v=beta&t=QgNCzyF0zINgzNZa50fYvWcg7JaH4z9lXJFIECccAbI',
     summary:
       'Abishrant Shandilya drives the web experience behind Carbon-X, focusing on interface quality, responsive implementation, and the frontend systems that make the platform feel polished, usable, and professional across devices.',
   },
