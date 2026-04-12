@@ -1477,9 +1477,6 @@ function TeamSection() {
             <h2 style={{ fontSize: 'clamp(30px, 4vw, 44px)', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: 16 }}>
               The people building Carbon-X
             </h2>
-            <p style={{ fontSize: 16, lineHeight: 1.8, color: 'var(--text-secondary)' }}>
-              Carbon-X is being built by a focused team spanning product, development, and strategy. Showing the people behind the platform helps the brand feel more credible, more human, and more transparent to visitors and future collaborators.
-            </p>
           </div>
         </FadeIn>
 
