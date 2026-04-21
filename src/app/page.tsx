@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useTransform, useMotionValue, useSpring, useMotionTemplate } from 'framer-motion';
 import {
   Leaf,
   Zap,
@@ -26,6 +26,8 @@ import {
   X,
   Instagram,
   Mail,
+  Play,
+  Pause,
 } from 'lucide-react';
 
 /* ═══════════════════════════════════════
@@ -62,23 +64,12 @@ function FadeIn({
 
 function Navbar() {
   const [scrolled, setScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
-  useEffect(() => {
-    const onResize = () => {
-      if (window.innerWidth >= 768) {
-        setMobileMenuOpen(false);
-      }
-    };
-
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
   }, []);
 
   const navItems = ['Features', 'X-Coin', 'How It Works', 'Impact'];
@@ -92,61 +83,105 @@ function Navbar() {
         right: 0,
         zIndex: 100,
         transition: 'all 0.3s ease',
-        background: scrolled || mobileMenuOpen ? 'var(--nav-surface-solid)' : 'transparent',
-        backdropFilter: scrolled || mobileMenuOpen ? 'blur(20px) saturate(1.2)' : 'none',
-        borderBottom: scrolled || mobileMenuOpen ? '1px solid var(--border-subtle)' : 'none',
-        boxShadow: scrolled || mobileMenuOpen ? 'var(--nav-shadow)' : 'none',
+        background: scrolled || dropdownOpen ? 'var(--nav-surface-solid)' : 'transparent',
+        backdropFilter: scrolled || dropdownOpen ? 'blur(20px) saturate(1.2)' : 'none',
+        borderBottom: scrolled || dropdownOpen ? '1px solid var(--border-subtle)' : 'none',
+        boxShadow: scrolled || dropdownOpen ? 'var(--nav-shadow)' : 'none',
       }}
     >
       <nav className='site-nav'>
-        <div className='site-nav__brand'>
-          <Image src='/images/logo-v2.png' alt='CARBON-X' width={1225} height={835} style={{ height: 30, width: 'auto' }} />
-          <span style={{ fontSize: 18, fontWeight: 700, letterSpacing: 1 }} className='text-gradient'>
-            CARBON-X
+        <div className='site-nav__brand' style={{ gap: '4px' }}>
+          <span style={{ fontSize: 16, fontWeight: 700, letterSpacing: 1 }} className='text-gradient'>
+            CARBON-
           </span>
+          <Image src='/images/logo-v2.png' alt='X' width={1225} height={835} style={{ height: 24, width: 'auto' }} />
         </div>
 
-        <div className='site-nav__desktop'>
-          <div className='site-nav__links'>
-            {navItems.map((item) => (
-              <a key={item} href={`#${item.toLowerCase().replace(/ /g, '-')}`} className='nav-link'>
-                {item}
-              </a>
-            ))}
-          </div>
-          <a href='#beta' className='button-primary button-primary--compact'>
-            Beta Phase
-          </a>
-        </div>
-
-        <div className='site-nav__controls'>
+        <div className='site-nav__actions' style={{ position: 'relative' }}>
           <button
             type='button'
-            className='site-nav__toggle'
-            aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
-            aria-expanded={mobileMenuOpen}
-            onClick={() => setMobileMenuOpen((open) => !open)}
+            className={dropdownOpen ? 'nav-dropdown-toggle is-active' : 'nav-dropdown-toggle'}
+            aria-label={dropdownOpen ? 'Close navigation menu' : 'Open navigation menu'}
+            aria-expanded={dropdownOpen}
+            onClick={() => setDropdownOpen((open) => !open)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              padding: '8px 18px',
+              background: dropdownOpen ? '#ddccff' : 'color-mix(in srgb, var(--surface-strong) 88%, transparent)',
+              color: dropdownOpen ? '#000000' : 'var(--text-primary)',
+              border: '1px solid var(--border-subtle)',
+              borderRadius: '999px',
+              fontSize: '15px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              minHeight: '40px',
+              transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+            }}
           >
-            {mobileMenuOpen ? <X style={{ width: 20, height: 20 }} /> : <Menu style={{ width: 20, height: 20 }} />}
+            {dropdownOpen ? 'Close' : 'Menu'}
+            {dropdownOpen ? <X style={{ width: 18, height: 18 }} /> : <Menu style={{ width: 18, height: 18 }} />}
           </button>
+          
+          <AnimatePresence>
+            {dropdownOpen && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                style={{
+                  position: 'absolute',
+                  top: '100%',
+                  right: 0,
+                  marginTop: '16px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-end',
+                  gap: 0,
+                  pointerEvents: 'auto',
+                }}
+              >
+                {[...navItems, 'Beta Phase'].map((item, i) => (
+                  <motion.a
+                    key={item}
+                    href={item === 'Beta Phase' ? '#beta' : `#${item.toLowerCase().replace(/ /g, '-')}`}
+                    initial={{ opacity: 0, y: -20, scale: 0.95, x: 0 }}
+                    animate={{ opacity: 1, y: 0, scale: 1, x: -(i * 12) }}
+                    exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.1 } }}
+                    transition={{
+                      default: { delay: i * 0.025, type: 'spring', stiffness: 450, damping: 22 },
+                      x: { delay: (i * 0.025) + 0.15, type: 'spring', stiffness: 400, damping: 25 },
+                    }}
+                    onClick={() => setDropdownOpen(false)}
+                    style={{
+                      display: 'block',
+                      marginTop: i === 0 ? 0 : '-12px',
+                      zIndex: 50 - i,
+                      position: 'relative',
+                      width: '200px',
+                      textAlign: 'center',
+                      padding: '16px 24px',
+                      background: '#ffffff',
+                      color: '#000000',
+                      borderRadius: '999px',
+                      border: '1px solid rgba(0,0,0,0.06)',
+                      fontSize: '15px',
+                      fontWeight: 600,
+                      textDecoration: 'none',
+                      boxShadow: '0 8px 30px rgba(0,0,0,0.15)',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {item}
+                  </motion.a>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </nav>
-
-      <div className={`site-nav__mobile ${mobileMenuOpen ? 'is-open' : ''}`}>
-        {navItems.map((item) => (
-          <a
-            key={item}
-            href={`#${item.toLowerCase().replace(/ /g, '-')}`}
-            className='site-nav__mobile-link'
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            {item}
-          </a>
-        ))}
-        <a href='#beta' className='site-nav__mobile-cta button-primary' onClick={() => setMobileMenuOpen(false)}>
-          Beta Phase
-        </a>
-      </div>
     </header>
   );
 }
@@ -166,6 +201,8 @@ function Hero() {
         alignItems: 'flex-start',
         justifyContent: 'center',
         overflow: 'hidden',
+        background: 'transparent',
+        zIndex: 10,
       }}
     >
       <div
@@ -332,7 +369,7 @@ const features = [
     icon: Target,
     title: 'Smart Action Tracking',
     desc: 'Log eco-friendly actions in seconds. Walk, eat plant-based, recycle — each precisely measured in CO₂ savings.',
-    color: '#4ade80',
+    color: '#2dd4bf',
   },
   {
     icon: BarChart3,
@@ -344,13 +381,13 @@ const features = [
     icon: Flame,
     title: 'Streaks & Gamification',
     desc: 'Build daily streaks, earn XP, climb from Climate Rookie to Earth Guardian. Compete on global leaderboards.',
-    color: '#22d3ee',
+    color: '#2dd4bf',
   },
   {
     icon: Leaf,
     title: 'AI-Powered Insights',
     desc: 'Personalized recommendations based on your lifestyle. Our AI surfaces the highest-impact actions for you.',
-    color: '#4ade80',
+    color: '#2dd4bf',
   },
   {
     icon: Users,
@@ -362,52 +399,62 @@ const features = [
     icon: Shield,
     title: 'Privacy First',
     desc: 'End-to-end encryption, no third-party data sales, full GDPR compliance. Your data stays yours.',
-    color: '#22d3ee',
+    color: '#2dd4bf',
   },
 ];
 
 function Features() {
-  return (
-    <section id='features' className='feature-section' style={{ padding: '120px 24px' }}>
-      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-        <FadeIn>
-          <div style={{ textAlign: 'center', marginBottom: 64 }}>
-            <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#4ade80', marginBottom: 12 }}>
-              Features
-            </p>
-            <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: 16 }}>
-              Everything you need to <span className='text-gradient'>make an impact</span>
-            </h2>
-            <p style={{ fontSize: 16, color: 'var(--text-secondary)', maxWidth: 520, margin: '0 auto' }}>
-              Cutting-edge tech meets behavioral science to make sustainability effortless and engaging.
-            </p>
-          </div>
-        </FadeIn>
+  const targetRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: targetRef });
+  
+  // Transform scrolls the track to the left. 
+  // Adjusted to -60% to account for wider cards.
+  const x = useTransform(scrollYProgress, [0, 1], ['0%', '-60%']);
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 20 }}>
-          {features.map((f, i) => (
-            <FadeIn key={f.title} delay={i * 0.06}>
-              <div className='card glow' style={{ padding: '36px 32px', height: '100%' }}>
+  return (
+    <section ref={targetRef} id='features' className='feature-section' style={{ height: '300vh', position: 'relative' }}>
+      <div className='feature-sticky-inner' style={{ position: 'sticky', top: 0, height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', overflow: 'hidden' }}>
+        <div style={{ width: '100%', maxWidth: 1100, margin: '0 auto', padding: '0 24px', flexShrink: 0 }}>
+          
+          <FadeIn>
+            <div style={{ textAlign: 'center', marginBottom: 64 }}>
+              <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#4ade80', marginBottom: 12 }}>
+                Features
+              </p>
+              <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: 16 }}>
+                Everything you need to <span className='text-gradient'>make an impact</span>
+              </h2>
+              <p style={{ fontSize: 16, color: 'var(--text-secondary)', maxWidth: 520, margin: '0 auto' }}>
+                Cutting-edge tech meets behavioral science to make sustainability effortless and engaging.
+              </p>
+            </div>
+          </FadeIn>
+
+          <motion.div className='feature-scroll-track' style={{ x, display: 'flex', gap: 24, width: 'max-content' }}>
+            {features.map((f, i) => (
+              <div key={f.title} className='card glow feature-card' style={{ width: 420, background: '#050a08', padding: '36px 36px', flexShrink: 0, whiteSpace: 'normal', display: 'flex', flexDirection: 'row', gap: 24, alignItems: 'stretch' }}>
                 <div
                   style={{
-                    width: 44,
-                    height: 44,
-                    borderRadius: 12,
+                    width: 100,
+                    flexShrink: 0,
+                    borderRadius: 20,
                     background: `${f.color}12`,
                     border: `1px solid ${f.color}20`,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    marginBottom: 20,
                   }}
                 >
-                  <f.icon style={{ width: 22, height: 22, color: f.color }} />
+                  <f.icon style={{ width: 64, height: 64, color: f.color, strokeWidth: 1.2 }} />
                 </div>
-                <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 10, letterSpacing: '-0.01em' }}>{f.title}</h3>
-                <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.7 }}>{f.desc}</p>
+                <div style={{ display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'center' }}>
+                  <h3 style={{ fontSize: 19, fontWeight: 700, marginBottom: 8, letterSpacing: '-0.01em', marginTop: -2 }}>{f.title}</h3>
+                  <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.7, flex: 1 }}>{f.desc}</p>
+                </div>
               </div>
-            </FadeIn>
-          ))}
+            ))}
+          </motion.div>
+          
         </div>
       </div>
     </section>
@@ -426,9 +473,69 @@ const steps = [
 ];
 
 function HowItWorks() {
+  const stepOffsets = [150, 100, 50, 0];
+
   return (
     <section id='how-it-works' className='steps-section' style={{ padding: '120px 24px' }}>
-      <div style={{ maxWidth: 960, margin: '0 auto' }}>
+      <style>{`
+        .diagonal-grid {
+          display: flex;
+          justify-content: space-between;
+          position: relative;
+          z-index: 1;
+          padding-top: 40px;
+          padding-bottom: 150px;
+        }
+        .diagonal-item {
+          flex: 1;
+          padding: 0 16px;
+          text-align: center;
+          position: relative;
+          z-index: 2;
+        }
+        .diagonal-rope {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          z-index: 0;
+          pointer-events: none;
+        }
+        .mobile-rope {
+          display: none;
+        }
+        @media (max-width: 768px) {
+          .diagonal-grid {
+            flex-direction: column;
+            align-items: center;
+            gap: 64px;
+            padding-bottom: 40px !important;
+          }
+          .diagonal-item {
+            transform: translateY(0) !important;
+            padding: 0;
+            max-width: 360px;
+          }
+          .diagonal-rope {
+             display: none;
+          }
+          .mobile-rope {
+             display: block;
+             position: absolute;
+             left: 50%;
+             top: 80px;
+             bottom: 80px;
+             width: 2px;
+             transform: translateX(-50%);
+             background-image: linear-gradient(to bottom, var(--accent-green) 50%, transparent 50%);
+             background-size: 100% 16px;
+             opacity: 0.3;
+             z-index: 0;
+          }
+        }
+      `}</style>
+      <div style={{ maxWidth: 1000, margin: '0 auto', position: 'relative' }}>
         <FadeIn>
           <div style={{ textAlign: 'center', marginBottom: 64 }}>
             <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#2dd4bf', marginBottom: 12 }}>
@@ -440,22 +547,31 @@ function HowItWorks() {
           </div>
         </FadeIn>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 32 }}>
+        <div className="diagonal-grid">
+          <div className="mobile-rope" />
+          <svg className="diagonal-rope" preserveAspectRatio="none">
+            <line x1="12.5%" y1={stepOffsets[0] + 76} x2="37.5%" y2={stepOffsets[1] + 76} stroke="var(--accent-green)" strokeWidth="2" strokeDasharray="6 6" opacity="0.4" />
+            <line x1="37.5%" y1={stepOffsets[1] + 76} x2="62.5%" y2={stepOffsets[2] + 76} stroke="var(--accent-green)" strokeWidth="2" strokeDasharray="6 6" opacity="0.4" />
+            <line x1="62.5%" y1={stepOffsets[2] + 76} x2="87.5%" y2={stepOffsets[3] + 76} stroke="var(--accent-green)" strokeWidth="2" strokeDasharray="6 6" opacity="0.4" />
+          </svg>
+
           {steps.map((s, i) => (
-            <FadeIn key={s.title} delay={i * 0.1}>
-              <div style={{ textAlign: 'center' }}>
+            <div key={s.title} className="diagonal-item" style={{ transform: `translateY(${stepOffsets[i]}px)` }}>
+              <FadeIn delay={i * 0.1}>
                 <div style={{ position: 'relative', display: 'inline-flex', marginBottom: 24 }}>
                   <div
                     style={{
                       width: 72,
                       height: 72,
                       borderRadius: 20,
-                      background: 'var(--bg-card)',
+                      background: '#050a08',
                       border: '1px solid var(--border-subtle)',
+                      boxShadow: 'var(--card-shadow)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       position: 'relative',
+                      zIndex: 2,
                     }}
                   >
                     <s.icon style={{ width: 28, height: 28, color: 'var(--accent-green)' }} />
@@ -475,15 +591,18 @@ function HowItWorks() {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
+                      zIndex: 3,
                     }}
                   >
                     {i + 1}
                   </span>
                 </div>
-                <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 8 }}>{s.title}</h3>
-                <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.6 }}>{s.desc}</p>
-              </div>
-            </FadeIn>
+                <div className='card glow' style={{ padding: '24px', background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: 24, textAlign: 'center' }}>
+                  <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 8 }}>{s.title}</h3>
+                  <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.6 }}>{s.desc}</p>
+                </div>
+              </FadeIn>
+            </div>
           ))}
         </div>
       </div>
@@ -494,6 +613,99 @@ function HowItWorks() {
 /* ═══════════════════════════════════════
    Impact
    ═══════════════════════════════════════ */
+
+function InteractiveCoin() {
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const mouseXSpring = useSpring(x, { stiffness: 200, damping: 25, mass: 0.5 });
+  const mouseYSpring = useSpring(y, { stiffness: 200, damping: 25, mass: 0.5 });
+
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ['15deg', '-15deg']);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ['-15deg', '15deg']);
+
+  const glareX = useTransform(mouseXSpring, [-0.5, 0.5], ['100%', '0%']);
+  const glareY = useTransform(mouseYSpring, [-0.5, 0.5], ['100%', '0%']);
+  const background = useMotionTemplate`radial-gradient(circle at ${glareX} ${glareY}, rgba(250, 204, 21, 0.25) 0%, transparent 60%)`;
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    
+    // Normalize values between -0.5 and 0.5
+    const xPct = mouseX / width - 0.5;
+    const yPct = mouseY / height - 0.5;
+    
+    x.set(xPct);
+    y.set(yPct);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  return (
+    <div className='coin-section__media' style={{ perspective: 1200, width: '100%', display: 'flex', justifyContent: 'center' }}>
+      <motion.div
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        style={{
+          width: 'min(100%, 340px)',
+          aspectRatio: '1 / 1',
+          borderRadius: 28,
+          background: 'linear-gradient(180deg, color-mix(in srgb, var(--accent-gold) 14%, transparent) 0%, color-mix(in srgb, var(--surface-strong) 42%, transparent) 100%)',
+          border: '1px solid var(--border-subtle)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: 24,
+          boxShadow: '0 24px 60px color-mix(in srgb, var(--accent-gold) 16%, transparent)',
+          transformStyle: 'preserve-3d',
+          rotateX,
+          rotateY,
+          position: 'relative',
+          cursor: 'pointer',
+        }}
+      >
+        <motion.div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            borderRadius: 28,
+            background,
+            pointerEvents: 'none',
+            zIndex: 10,
+          }}
+        />
+        <motion.div
+          style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transform: 'translateZ(80px)',
+            transformStyle: 'preserve-3d',
+          }}
+        >
+          <Image
+            src='/images/coin.png'
+            alt='X-Coin'
+            width={260}
+            height={260}
+            style={{ width: '100%', height: 'auto', maxWidth: 260, filter: 'drop-shadow(0 30px 40px rgba(0,0,0,0.5))' }}
+            priority
+          />
+        </motion.div>
+      </motion.div>
+    </div>
+  );
+}
 
 function XCoin() {
   return (
@@ -615,32 +827,7 @@ function XCoin() {
                 </div>
               </div>
 
-              <div className='coin-section__media' style={{ display: 'flex', justifyContent: 'center' }}>
-                <div
-                  style={{
-                    width: 'min(100%, 340px)',
-                    aspectRatio: '1 / 1',
-                    borderRadius: 28,
-                    background:
-                      'linear-gradient(180deg, color-mix(in srgb, var(--accent-gold) 14%, transparent) 0%, color-mix(in srgb, var(--surface-strong) 42%, transparent) 100%)',
-                    border: '1px solid var(--border-subtle)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: 24,
-                    boxShadow: '0 24px 60px color-mix(in srgb, var(--accent-gold) 16%, transparent)',
-                  }}
-                >
-                  <Image
-                    src='/images/coin.png'
-                    alt='X-Coin'
-                    width={260}
-                    height={260}
-                    className='animate-float'
-                    style={{ width: '100%', height: 'auto', maxWidth: 260 }}
-                  />
-                </div>
-              </div>
+              <InteractiveCoin />
             </div>
           </div>
         </FadeIn>
@@ -651,7 +838,7 @@ function XCoin() {
 
 function Impact() {
   const impacts = [
-    { icon: TreePine, value: '12,847', label: 'Trees equivalent CO₂ absorbed', color: '#4ade80' },
+    { icon: TreePine, value: '12', label: 'Total equivalent trees planted', color: '#4ade80' },
     { icon: Droplets, value: '12+', label: 'Liters of water conserved', color: '#2dd4bf' },
     { icon: Wind, value: '180+', label: 'km of car travel offset', color: '#22d3ee' },
     {
@@ -666,7 +853,8 @@ function Impact() {
     },
   ];
 
-  const visibleImpacts = impacts.slice(1);
+  const mainImpact = impacts[0];
+  const sideImpacts = impacts.slice(1);
 
   return (
     <section id='impact' className='impact-section' style={{ padding: '120px 24px' }}>
@@ -682,25 +870,165 @@ function Impact() {
           </div>
         </FadeIn>
 
-        <div className='impact-grid'>
-          {visibleImpacts.map((item, i) => (
-            <FadeIn key={item.value} delay={i * 0.1} className='impact-grid__item'>
+        <style>{`
+          .impact-hero-layout {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            gap: 80px;
+            flex-wrap: wrap;
+          }
+          .impact-side-column {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            position: relative;
+            z-index: 1;
+          }
+          .orbit-lines-left {
+            position: absolute;
+            left: 100%;
+            top: 0;
+            bottom: 0;
+            width: 80px;
+            pointer-events: none;
+            z-index: 0;
+          }
+          .orbit-lines-right {
+            position: absolute;
+            right: 100%;
+            top: 0;
+            bottom: 0;
+            width: 80px;
+            pointer-events: none;
+            z-index: 0;
+          }
+          @media (max-width: 900px) {
+            .impact-hero-layout {
+              gap: 48px;
+              flex-direction: column;
+            }
+            .orbit-left-col { order: 2; }
+            .orbit-middle-col { order: 1; }
+            .orbit-right-col { order: 3; }
+            .orbit-lines-left, .orbit-lines-right {
+              display: none;
+            }
+          }
+        `}</style>
+        <div className="impact-hero-layout">
+
+          {/* Left Column (1 Smaller Square) */}
+          <div className="impact-side-column orbit-left-col">
+            <div className="orbit-lines-left">
+              <svg width="100%" height="100%" style={{ overflow: 'visible' }}>
+                <line x1="-2" y1="50%" x2="160" y2="50%" stroke="var(--accent-green)" strokeWidth="2" strokeDasharray="6 6" opacity="0.3" />
+              </svg>
+            </div>
+            {(() => {
+              const leftItem = sideImpacts[0];
+              const LeftIcon = leftItem.icon;
+              return (
+                <FadeIn delay={0.2}>
+                  <div
+                    className='card impact-card'
+                    style={{
+                      aspectRatio: '1 / 1',
+                      width: 200,
+                      borderRadius: 24,
+                      padding: '24px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'center',                  
+                      alignItems: 'center',
+                      textAlign: 'center',
+                      boxShadow: `0 0 60px ${leftItem.color}08`,
+                      position: 'relative',
+                      zIndex: 2,
+                    }}
+                  >
+                    <LeftIcon style={{ width: 32, height: 32, color: leftItem.color, margin: '0 auto 16px' }} />
+                    <div style={{ fontSize: 'clamp(28px, 4vw, 36px)', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: 4 }} className='text-gradient'>
+                      {leftItem.value}
+                    </div>
+                    <p style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 500, lineHeight: 1.4 }}>{leftItem.label}</p>
+                  </div>
+                </FadeIn>
+              );
+            })()}
+          </div>
+
+          {/* Middle Column (Large Hero Square) */}
+          <div className="orbit-middle-col">
+            <FadeIn delay={0.1}>
               <div
-                className='card impact-card'
+                className='card impact-card glow'
                 style={{
-                  padding: '48px 32px',
+                  aspectRatio: '1 / 1',
+                  width: '100%',
+                  maxWidth: 480,
+                  minWidth: 320,
+                  margin: '0 auto',
+                  borderRadius: 48,
+                  padding: '64px 48px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'center',
                   textAlign: 'center',
-                  boxShadow: `0 0 60px ${item.color}08`,
+                  boxShadow: `0 0 80px ${mainImpact.color}15`,
+                  background: 'var(--bg-card)',
+                  position: 'relative',
+                  zIndex: 2,
                 }}
               >
-                <item.icon style={{ width: 36, height: 36, color: item.color, margin: '0 auto 20px' }} />
-                <div style={{ fontSize: 'clamp(36px, 5vw, 52px)', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: 8 }} className='text-gradient'>
-                  {item.value}
+                <mainImpact.icon style={{ width: 80, height: 80, color: mainImpact.color, margin: '0 auto 24px' }} />
+                <div style={{ fontSize: 'clamp(80px, 10vw, 120px)', fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1, marginBottom: 16 }} className='text-gradient'>
+                  {mainImpact.value}
                 </div>
-                <p style={{ fontSize: 14, color: 'var(--text-muted)', fontWeight: 500 }}>{item.label}</p>
+                <p style={{ fontSize: 24, color: 'var(--text-secondary)', fontWeight: 600 }}>{mainImpact.label}</p>
               </div>
             </FadeIn>
-          ))}
+          </div>
+
+          {/* Right Column (2 Smaller Squares) */}
+          <div className="impact-side-column orbit-right-col">
+            <div className="orbit-lines-right">
+              <svg width="100%" height="100%" style={{ overflow: 'visible' }}>
+                <line x1="82" y1="100" x2="-80" y2="216" stroke="var(--accent-green)" strokeWidth="2" strokeDasharray="6 6" opacity="0.3" />
+                <line x1="82" y1="332" x2="-80" y2="216" stroke="var(--accent-green)" strokeWidth="2" strokeDasharray="6 6" opacity="0.3" />
+              </svg>
+            </div>
+            {[sideImpacts[1], sideImpacts[2]].map((item, i) => (
+              <FadeIn key={item.value} delay={0.3 + (i * 0.1)}>
+                <div
+                  className='card impact-card'
+                  style={{
+                    aspectRatio: '1 / 1',
+                    width: 200,
+                    borderRadius: 24,
+                    padding: '24px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',                  
+                    alignItems: 'center',
+                    textAlign: 'center',
+                    boxShadow: `0 0 60px ${item.color}08`,
+                    position: 'relative',
+                    zIndex: 2,
+                  }}
+                >
+                  <item.icon style={{ width: 32, height: 32, color: item.color, margin: '0 auto 16px' }} />
+                  <div style={{ fontSize: 'clamp(28px, 4vw, 36px)', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: 4 }} className='text-gradient'>
+                    {item.value}
+                  </div>
+                  <p style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 500, lineHeight: 1.4 }}>{item.label}</p>
+                </div>
+              </FadeIn>
+            ))}
+          </div>
+
         </div>
 
       </div>
@@ -713,9 +1041,36 @@ function Impact() {
    ═══════════════════════════════════════ */
 
 function BetaPhase() {
+  const betaRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: betaRef,
+    offset: ['start end', 'end start'],
+  });
+  const bgY = useSpring(useTransform(scrollYProgress, [0, 1], [-70, 70]), {
+    stiffness: 120,
+    damping: 26,
+    mass: 0.4,
+  });
+  const contentY = useSpring(useTransform(scrollYProgress, [0, 1], [36, -36]), {
+    stiffness: 140,
+    damping: 28,
+    mass: 0.45,
+  });
+  const contentScale = useSpring(useTransform(scrollYProgress, [0, 0.5, 1], [0.985, 1, 1.015]), {
+    stiffness: 140,
+    damping: 28,
+    mass: 0.45,
+  });
+  const glowY = useSpring(useTransform(scrollYProgress, [0, 1], [24, -24]), {
+    stiffness: 120,
+    damping: 26,
+    mass: 0.4,
+  });
+
   return (
     <section
-      className='cta-section'
+      ref={betaRef}
+      className='cta-section beta-phase-section'
       id='beta'
       style={{
         padding: '120px 24px',
@@ -723,8 +1078,25 @@ function BetaPhase() {
         overflow: 'hidden',
       }}
     >
-      {/* Glow background */}
-      <div
+      <motion.div
+        aria-hidden='true'
+        style={{
+          position: 'absolute',
+          inset: '-8%',
+          zIndex: 0,
+          y: bgY,
+          scale: 1.14,
+          backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.78)), url("/images/bg.jpg")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center center',
+          backgroundRepeat: 'no-repeat',
+          pointerEvents: 'none',
+          willChange: 'transform',
+        }}
+      />
+
+      <motion.div
+        aria-hidden='true'
         style={{
           position: 'absolute',
           top: '50%',
@@ -732,13 +1104,25 @@ function BetaPhase() {
           transform: 'translate(-50%, -50%)',
           width: 600,
           height: 400,
+          zIndex: 1,
+          y: glowY,
           background: 'radial-gradient(circle, var(--hero-orb-primary) 0%, transparent 70%)',
           pointerEvents: 'none',
+          willChange: 'transform',
         }}
       />
 
-      <FadeIn>
-        <div style={{ maxWidth: 640, margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 10 }}>
+      <motion.div
+        style={{
+          position: 'relative',
+          zIndex: 10,
+          y: contentY,
+          scale: contentScale,
+          willChange: 'transform',
+        }}
+      >
+        <FadeIn>
+          <div style={{ maxWidth: 640, margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 10 }}>
           <span className='badge' style={{ marginBottom: 24, display: 'inline-flex' }}>
             <Zap style={{ width: 14, height: 14 }} /> Currently in beta testing phase
           </span>
@@ -789,6 +1173,148 @@ function BetaPhase() {
           {/*
             Free · No credit card · Available on Play Store
           */}
+          </div>
+        </FadeIn>
+      </motion.div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════
+   Founder Video
+   ═══════════════════════════════════════ */
+
+function FounderVideo() {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  const togglePlay = () => {
+    if (!iframeRef.current) return;
+    
+    if (isPlaying) {
+      iframeRef.current.contentWindow?.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+      setIsPlaying(false);
+    } else {
+      iframeRef.current.contentWindow?.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+      setIsPlaying(true);
+      if (!hasStarted) setHasStarted(true);
+    }
+  };
+
+  return (
+    <section className='video-section' style={{ padding: '100px 24px', position: 'relative' }}>
+      <FadeIn>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '56px', alignItems: 'center', width: '100%' }}>
+            
+            {/* Left Side: Video */}
+            <div style={{ flex: '1 1 500px', width: '100%', position: 'relative' }}>
+              <div className='ripple-ring' style={{ animationDelay: '0s' }} />
+              <div className='ripple-ring' style={{ animationDelay: '1.2s' }} />
+              <div className='ripple-ring' style={{ animationDelay: '2.4s' }} />
+              <div
+                style={{
+                  position: 'relative',
+                  width: '100%',
+                  paddingTop: '56.25%',
+                  borderRadius: 24,
+                  background: 'var(--bg-card)',
+                  overflow: 'visible',
+                  boxShadow: 'var(--card-shadow-hover)',
+                  border: '1px solid var(--border-subtle)',
+                }}
+              >
+                <iframe
+                  ref={iframeRef}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    border: 0,
+                    borderRadius: 24,
+                    pointerEvents: isPlaying ? 'auto' : 'none',
+                  }}
+                  src='https://www.youtube.com/embed/3aoGGa2hb0w?enablejsapi=1&controls=0&modestbranding=1&rel=0'
+                  title='CARBON-X Founder Message'
+                  allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
+                  allowFullScreen
+                />
+
+                <div 
+                  onClick={togglePlay}
+                  style={{
+                    position: 'absolute',
+                    top: 0, left: 0, width: '100%', height: '100%',
+                    borderRadius: 24,
+                    backgroundImage: 'url("https://img.youtube.com/vi/3aoGGa2hb0w/maxresdefault.jpg")',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    cursor: 'pointer',
+                    opacity: hasStarted ? 0 : 1,
+                    transition: 'opacity 0.6s ease',
+                    pointerEvents: hasStarted ? 'none' : 'auto',
+                  }}
+                >
+                  <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.15)', borderRadius: 24 }} />
+                </div>
+
+                <button
+                  onClick={togglePlay}
+                  style={{
+                    position: 'absolute',
+                    bottom: -24,
+                    right: -24,
+                    width: 72,
+                    height: 72,
+                    backgroundColor: 'var(--accent-green)',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    border: 'none',
+                    boxShadow: '0 8px 32px rgba(105, 192, 143, 0.4)',
+                    zIndex: 10,
+                    transition: 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                  }}
+                  onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.08)'}
+                  onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                  aria-label={isPlaying ? "Pause Founder Video" : "Play Founder Video"}
+                >
+                  {isPlaying ? (
+                    <Pause fill="#08110e" color="#08110e" style={{ width: 28, height: 28 }} />
+                  ) : (
+                    <Play fill="#08110e" color="#08110e" style={{ width: 28, height: 28, marginLeft: 4 }} />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Right Side: Text */}
+            <div style={{ flex: '1 1 350px' }}>
+              <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--accent-cyan)', marginBottom: 12 }}>
+                Message from the Founder
+              </p>
+              <h2 style={{ fontSize: 'clamp(32px, 4vw, 44px)', fontWeight: 800, letterSpacing: '-0.02em', marginBottom: 32, lineHeight: 1.15 }}>
+                The Vision behind <br /><span className='text-gradient'>Carbon-X</span>
+              </h2>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: 24 }}>
+                <h3 style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-primary)' }}>Arman Khan</h3>
+                <p style={{ fontSize: 16, color: 'var(--text-muted)', fontWeight: 500 }}>Founder & CEO</p>
+              </div>
+
+              <div style={{ paddingLeft: 20, borderLeft: '3px solid var(--accent-green)' }}>
+                <p style={{ fontSize: 17, color: 'var(--text-secondary)', fontStyle: 'italic', lineHeight: 1.6 }}>
+                  "We believe that saving the planet shouldn't feel like a chore. Carbon-X turns everyday positive actions into a genuinely rewarding, gamified experience."
+                </p>
+              </div>
+            </div>
+            
+          </div>
         </div>
       </FadeIn>
     </section>
@@ -801,7 +1327,7 @@ function BetaPhase() {
 
 function Footer() {
   return (
-    <footer className='site-footer'>
+    <footer className='site-footer' style={{ background: '#000000', position: 'relative', zIndex: 10 }}>
       <div className='site-footer__inner'>
         <div className='site-footer__brand'>
           <Image src='/images/logo-v2.png' alt='CARBON-X' width={1225} height={835} style={{ height: 24, width: 'auto' }} />
@@ -857,12 +1383,39 @@ export default function Home() {
     window.localStorage.removeItem('carbonx-theme');
   }, []);
 
+  useEffect(() => {
+    let frameId = 0;
+
+    const updateGridOffset = () => {
+      frameId = 0;
+      const offset = window.scrollY * -0.12;
+      document.documentElement.style.setProperty('--grid-scroll-offset', `${offset}px`);
+    };
+
+    const handleScroll = () => {
+      if (frameId) return;
+      frameId = window.requestAnimationFrame(updateGridOffset);
+    };
+
+    updateGridOffset();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      if (frameId) {
+        window.cancelAnimationFrame(frameId);
+      }
+      document.documentElement.style.setProperty('--grid-scroll-offset', '0px');
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
   return (
     <>
       <div className='noise' />
       <Navbar />
       <main className='page-shell'>
         <Hero />
+        <FounderVideo />
         <Features />
         <div className='section-divider' />
         <XCoin />

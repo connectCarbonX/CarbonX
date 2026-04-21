@@ -2,8 +2,8 @@
 
 :root {
   color-scheme: dark;
-  --bg-primary: #08110e;
-  --bg-secondary: #0f1b17;
+  --bg-primary: #000000;
+  --bg-secondary: #000000;
   --bg-elevated: rgba(13, 23, 19, 0.72);
   --bg-card: rgba(14, 25, 20, 0.78);
   --bg-card-hover: rgba(20, 34, 27, 0.92);
@@ -33,6 +33,7 @@
   --card-shadow-hover: 0 30px 68px rgba(0, 0, 0, 0.32);
   --focus-ring: rgba(105, 192, 143, 0.28);
   --section-divider: rgba(238, 244, 239, 0.08);
+  --grid-scroll-offset: 0px;
 }
 
 * {
@@ -49,10 +50,7 @@ html {
 
 body {
   min-height: 100vh;
-  background:
-    radial-gradient(circle at top left, var(--hero-orb-primary), transparent 28%),
-    radial-gradient(circle at top right, var(--hero-orb-secondary), transparent 26%),
-    linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 42%, var(--bg-primary) 100%);
+  background-color: #000000;
   color: var(--text-primary);
   font-family: var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   line-height: 1.6;
@@ -92,6 +90,39 @@ body::after {
 
 main.page-shell > section {
   position: relative;
+}
+
+main.page-shell > section:not(.hero-section):not(.beta-phase-section),
+.site-footer {
+  isolation: isolate;
+}
+
+main.page-shell > section:not(.hero-section):not(.beta-phase-section)::before,
+.site-footer::before {
+  content: '';
+  position: absolute;
+  top: -12%;
+  left: -22%;
+  width: 144%;
+  height: 170%;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.14) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.14) 1px, transparent 1px);
+  background-size: 96px 96px;
+  background-position: center top;
+  opacity: 0.9;
+  transform-origin: center top;
+  transform: translate3d(0, var(--grid-scroll-offset), 0) perspective(1100px) rotateX(76deg) scale(1.55);
+  clip-path: ellipse(72% 58% at 50% 0%);
+  will-change: transform;
+}
+
+main.page-shell > section:not(.hero-section):not(.beta-phase-section) > *,
+.site-footer > * {
+  position: relative;
+  z-index: 1;
 }
 
 a,
@@ -162,9 +193,8 @@ button:focus-visible {
   padding: 1px;
   background: linear-gradient(
     135deg,
-    color-mix(in srgb, var(--accent-green) 40%, transparent),
-    color-mix(in srgb, var(--accent-teal) 30%, transparent),
-    transparent 68%
+    color-mix(in srgb, var(--accent-green) 60%, transparent),
+    transparent 70%
   );
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
@@ -232,9 +262,9 @@ button:focus-visible {
 }
 
 .button-primary--compact {
-  min-height: 42px;
-  padding: 10px 18px;
-  font-size: 14px;
+  min-height: 36px;
+  padding: 6px 16px;
+  font-size: 13px;
 }
 
 .button-primary--large {
@@ -325,7 +355,7 @@ button:focus-visible {
 .site-nav {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 14px 24px;
+  padding: 10px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -353,8 +383,8 @@ button:focus-visible {
 .site-nav__links {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px;
+  gap: 6px;
+  padding: 4px;
   border: 1px solid var(--border-subtle);
   border-radius: 999px;
   background: color-mix(in srgb, var(--surface-strong) 76%, transparent);
@@ -362,7 +392,7 @@ button:focus-visible {
 
 .nav-link {
   color: var(--text-secondary);
-  padding: 10px 14px;
+  padding: 6px 14px;
   border-radius: 999px;
   font-size: 14px;
   font-weight: 500;
@@ -377,8 +407,8 @@ button:focus-visible {
   display: none;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: 36px;
+  height: 36px;
   border: 1px solid var(--border-subtle);
   border-radius: 999px;
   background: color-mix(in srgb, var(--surface-strong) 92%, transparent);
@@ -405,7 +435,7 @@ button:focus-visible {
   padding-top: 128px;
   padding-bottom: 88px;
   isolation: isolate;
-  background: #050b09;
+  background: #000000;
 }
 
 .hero-section__video {
@@ -422,12 +452,7 @@ button:focus-visible {
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: linear-gradient(
-    180deg,
-    rgba(4, 9, 8, 0.32) 0%,
-    rgba(4, 9, 8, 0.22) 38%,
-    rgba(4, 9, 8, 0.48) 100%
-  );
+  background: rgba(0, 0, 0, 0.6);
 }
 
 .hero-section__content {
@@ -505,6 +530,11 @@ button:focus-visible {
 
 .coin-section__conversion {
   white-space: nowrap;
+}
+
+.beta-phase-section {
+  background-color: #000000;
+  isolation: isolate;
 }
 
 .site-footer {
@@ -588,7 +618,7 @@ button:focus-visible {
 
 @media (max-width: 767px) {
   .site-nav {
-    padding: 12px 16px;
+    padding: 8px 16px;
   }
 
   .site-nav__desktop {
@@ -748,6 +778,49 @@ button:focus-visible {
 
   .coin-section__conversion {
     font-size: 10px !important;
+  }
+}
+
+@keyframes video-ripple {
+  0% {
+    inset: 0px;
+    border-radius: 24px;
+    opacity: 0.6;
+  }
+  100% {
+    inset: -80px;
+    border-radius: 104px;
+    opacity: 0;
+  }
+}
+
+.ripple-ring {
+  position: absolute;
+  border: 1px solid var(--accent-green);
+  z-index: -1;
+  pointer-events: none;
+  animation: video-ripple 3.5s cubic-bezier(0.1, 0.4, 0.4, 1) infinite;
+}
+
+@media (max-width: 1024px) {
+  .feature-section {
+    height: auto !important;
+    padding: 80px 0 !important;
+  }
+  .feature-sticky-inner {
+    position: relative !important;
+    height: auto !important;
+    display: block !important;
+    overflow: visible !important;
+  }
+  .feature-scroll-track {
+    transform: none !important;
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+    width: 100% !important;
+  }
+  .feature-card {
+    width: 100% !important;
   }
 }
 
