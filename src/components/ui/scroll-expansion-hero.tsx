@@ -43,13 +43,9 @@ const ScrollExpandMedia = ({
     const sectionRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
-        const animationFrame = window.requestAnimationFrame(() => {
-            setScrollProgress(0);
-            setShowContent(false);
-            setMediaFullyExpanded(false);
-        });
-
-        return () => window.cancelAnimationFrame(animationFrame);
+        setScrollProgress(0);
+        setShowContent(false);
+        setMediaFullyExpanded(false);
     }, [mediaType]);
 
     useEffect(() => {

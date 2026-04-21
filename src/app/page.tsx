@@ -1,32 +1,30 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { motion } from 'framer-motion';
-import {
-  EMPTY_SITE_CONSTANTS,
-  subscribeToSiteConstants,
-  type SiteConstants,
-} from '@/lib/site-constants';
-import { SiteNavbar } from '@/components/site-navbar';
 import {
   Leaf,
   Zap,
   TrendingUp,
+  Users,
   Award,
   Shield,
+  ChevronDown,
   ArrowRight,
   BarChart3,
   Target,
   Flame,
+  Globe,
   TreePine,
   Droplets,
   Wind,
   Check,
+  Star,
   Activity,
+  Menu,
+  X,
   Instagram,
-  Linkedin,
   Mail,
 } from 'lucide-react';
 
@@ -35,418 +33,6 @@ import {
    ═══════════════════════════════════════ */
 
 const ease = [0.16, 1, 0.3, 1] as const;
-export type MarketingSitePage = 'home' | 'about' | 'features' | 'x-coin' | 'how-it-works' | 'impact' | 'beta';
-
-type PageContent = {
-  badge: string;
-  title: string;
-  accentTitle: string;
-  description: string;
-  primaryHref: string;
-  primaryLabel: string;
-  secondaryHref: string;
-  secondaryLabel: string;
-  overviewEyebrow: string;
-  overviewTitle: string;
-  overviewIntro: string;
-  overviewParagraphs: string[];
-  pillarTitle: string;
-  pillars: Array<{
-    title: string;
-    description: string;
-  }>;
-  answersTitle: string;
-  answers: Array<{
-    question: string;
-    answer: string;
-  }>;
-};
-
-const pageContent: Record<MarketingSitePage, PageContent> = {
-  home: {
-    badge: 'Beta testing now',
-    title: 'Track your carbon.',
-    accentTitle: 'Save the planet.',
-    description:
-      'Log actions, see savings, and earn X-Coin as better habits become routine.',
-    primaryHref: '/beta',
-    primaryLabel: 'Beta details',
-    secondaryHref: '/features',
-    secondaryLabel: 'See features',
-    overviewEyebrow: 'Why Carbon-X',
-    overviewTitle: 'Carbon habits, made visible',
-    overviewIntro:
-      'Carbon-X turns simple choices into clear progress you can track.',
-    overviewParagraphs: [
-      'The product keeps the loop short: log an action, read the impact, and build a streak you can keep.',
-    ],
-    pillarTitle: 'Why Carbon-X matters',
-    pillars: [
-      {
-        title: 'From intent to action',
-        description:
-          'Carbon-X turns climate intent into a repeatable product loop people can actually use.',
-      },
-      {
-        title: 'A trusted impact layer',
-        description:
-          'Clear metrics, simple rewards, and beta validation make the product easier to trust.',
-      },
-    ],
-    answersTitle: 'Quick answer',
-    answers: [
-      {
-        question: 'What is Carbon-X?',
-        answer:
-          'A beta carbon-tracking platform for everyday sustainable actions.',
-      },
-    ],
-  },
-  about: {
-    badge: 'About Carbon-X',
-    title: 'Meet the team.',
-    accentTitle: 'Built with purpose and ambition.',
-    description:
-      'A small team building a simple way to track sustainable action.',
-    primaryHref: '/features',
-    primaryLabel: 'Explore features',
-    secondaryHref: '/beta',
-    secondaryLabel: 'View beta phase',
-    overviewEyebrow: 'Who we are',
-    overviewTitle: 'Focused on practical climate tools',
-    overviewIntro:
-      'Carbon-X is being shaped through product design, engineering, and beta feedback.',
-    overviewParagraphs: [
-      'The goal is direct: make low-carbon choices easier to notice, repeat, and value.',
-    ],
-    pillarTitle: 'Team focus',
-    pillars: [
-      {
-        title: 'Product clarity',
-        description:
-          'Keep the experience easy to understand.',
-      },
-      {
-        title: 'Careful launch',
-        description:
-          'Use beta learning before wider release.',
-      },
-    ],
-    answersTitle: 'Team note',
-    answers: [
-      {
-        question: 'Who is building Carbon-X?',
-        answer:
-          'Arman Khan leads the product vision and Abishrant Shandilya builds the web experience.',
-      },
-    ],
-  },
-  features: {
-    badge: 'Feature overview',
-    title: 'Explore the platform.',
-    accentTitle: 'Built for real habit change.',
-    description:
-      'Simple tools for logging actions, reading impact, and staying consistent.',
-    primaryHref: '/beta',
-    primaryLabel: 'Beta details',
-    secondaryHref: '/impact',
-    secondaryLabel: 'View impact',
-    overviewEyebrow: 'Feature set',
-    overviewTitle: 'Small actions, useful feedback',
-    overviewIntro:
-      'Each feature supports a cleaner habit loop.',
-    overviewParagraphs: [
-      'Carbon-X avoids heavy dashboards and focuses on fast actions, clear stats, and light motivation.',
-    ],
-    pillarTitle: 'Core features',
-    pillars: [
-      {
-        title: 'Action log',
-        description:
-          'Save walking, recycling, plant meals, and other choices quickly.',
-      },
-      {
-        title: 'Impact cards',
-        description:
-          'Turn activity into carbon, water, and travel equivalents.',
-      },
-      {
-        title: 'Progress cues',
-        description:
-          'Use streaks, XP, and X-Coin to keep users returning.',
-      },
-    ],
-    answersTitle: 'Feature note',
-    answers: [
-      {
-        question: 'Why keep the feature set focused?',
-        answer:
-          'The beta should prove the main loop before adding more layers.',
-      },
-    ],
-  },
-  'x-coin': {
-    badge: 'Incentive layer',
-    title: 'Reward every action.',
-    accentTitle: 'Make impact more tangible.',
-    description:
-      'X-Coin gives eco-actions a visible reward inside Carbon-X.',
-    primaryHref: '/beta',
-    primaryLabel: 'Beta details',
-    secondaryHref: '/how-it-works',
-    secondaryLabel: 'See the journey',
-    overviewEyebrow: 'Why X-Coin',
-    overviewTitle: 'A reward for repeat action',
-    overviewIntro:
-      'Coins make progress feel tangible without replacing the climate goal.',
-    overviewParagraphs: [
-      'X-Coin connects effort to a simple balance users can build over time.',
-    ],
-    pillarTitle: 'Reward basics',
-    pillars: [
-      {
-        title: 'Clear conversion',
-        description:
-          '10 X-Coin equals 1 kg of CO2 saved.',
-      },
-      {
-        title: 'No hype',
-        description:
-          'Rewards support the habit, not the other way around.',
-      },
-    ],
-    answersTitle: 'X-Coin note',
-    answers: [
-      {
-        question: 'Is X-Coin a currency?',
-        answer:
-          'No. In beta, it is a product reward and progress signal.',
-      },
-    ],
-  },
-  'how-it-works': {
-    badge: 'Product flow',
-    title: 'Start simply.',
-    accentTitle: 'Stay consistent over time.',
-    description:
-      'Join the beta, log actions, check impact, and keep going.',
-    primaryHref: '/beta',
-    primaryLabel: 'Join the beta',
-    secondaryHref: '/features',
-    secondaryLabel: 'See features',
-    overviewEyebrow: 'User journey',
-    overviewTitle: 'A short loop for better habits',
-    overviewIntro:
-      'Every step is meant to be obvious.',
-    overviewParagraphs: [
-      'Carbon-X keeps the journey practical: act, log, learn, repeat.',
-    ],
-    pillarTitle: 'Flow basics',
-    pillars: [
-      {
-        title: 'Easy start',
-        description:
-          'Join without a complicated setup.',
-      },
-      {
-        title: 'Fast feedback',
-        description:
-          'See impact right after logging.',
-      },
-    ],
-    answersTitle: 'Flow note',
-    answers: [
-      {
-        question: 'Why keep the process so simple?',
-        answer:
-          'A shorter flow makes repeat use more likely.',
-      },
-    ],
-  },
-  impact: {
-    badge: 'Live impact view',
-    title: 'Measure progress.',
-    accentTitle: 'Show real environmental value.',
-    description:
-      'See carbon savings, water conservation, and travel offsets at a glance.',
-    primaryHref: '/beta',
-    primaryLabel: 'Beta details',
-    secondaryHref: '/x-coin',
-    secondaryLabel: 'Explore X-Coin',
-    overviewEyebrow: 'Impact view',
-    overviewTitle: 'Numbers people can read quickly',
-    overviewIntro:
-      'Impact should feel clear, not like a dense report.',
-    overviewParagraphs: [
-      'The page highlights live totals and one nature equivalent so users understand the result faster.',
-    ],
-    pillarTitle: 'Impact basics',
-    pillars: [
-      {
-        title: 'Primary totals',
-        description:
-          'Keep the main numbers visible.',
-      },
-      {
-        title: 'Simple context',
-        description:
-          'Use tree equivalents only where they help.',
-      },
-    ],
-    answersTitle: 'Impact note',
-    answers: [
-      {
-        question: 'Why are equivalents like trees useful?',
-        answer:
-          'They make a carbon number easier to understand.',
-      },
-    ],
-  },
-  beta: {
-    badge: 'Current stage',
-    title: 'Build the product carefully.',
-    accentTitle: 'Prepare for a stronger launch.',
-    description:
-      'Carbon-X is still being tested before public release.',
-    primaryHref: '/features',
-    primaryLabel: 'Explore features',
-    secondaryHref: '/impact',
-    secondaryLabel: 'See impact',
-    overviewEyebrow: 'Beta phase',
-    overviewTitle: 'Testing before launch',
-    overviewIntro:
-      'The team is refining the core experience now.',
-    overviewParagraphs: [
-      'Beta feedback helps tune logging, rewards, and impact scoring before the app opens wider.',
-    ],
-    pillarTitle: 'Beta focus',
-    pillars: [
-      {
-        title: 'Product loop',
-        description:
-          'Check whether users can log and return easily.',
-      },
-      {
-        title: 'Scoring logic',
-        description:
-          'Make rewards and impact numbers feel clear.',
-      },
-    ],
-    answersTitle: 'Beta note',
-    answers: [
-      {
-        question: 'Is the app publicly available right now?',
-        answer:
-          'No. Carbon-X is currently in beta and not available for download.',
-      },
-    ],
-  },
-};
-
-type CountTarget = {
-  prefix: string;
-  suffix: string;
-  value: number;
-  decimals: number;
-};
-
-function parseCountTarget(value: string | number | null) {
-  if (typeof value === 'number') {
-    if (!Number.isFinite(value)) {
-      return null;
-    }
-
-    return {
-      prefix: '',
-      suffix: '',
-      value,
-      decimals: Number.isInteger(value) ? 0 : 1,
-    } satisfies CountTarget;
-  }
-
-  if (!value) {
-    return null;
-  }
-
-  const match = value.trim().match(/^([^0-9-]*)(-?\d[\d,]*(?:\.\d+)?)(.*)$/);
-
-  if (!match) {
-    return null;
-  }
-
-  const [, prefix, numericPart, suffix] = match;
-  const parsedValue = Number.parseFloat(numericPart.replace(/,/g, ''));
-
-  if (!Number.isFinite(parsedValue)) {
-    return null;
-  }
-
-  return {
-    prefix,
-    suffix,
-    value: parsedValue,
-    decimals: numericPart.includes('.') ? numericPart.split('.')[1]?.length ?? 0 : 0,
-  } satisfies CountTarget;
-}
-
-function formatCountValue(target: CountTarget, nextValue: number) {
-  const safeValue = target.decimals === 0 ? Math.round(nextValue) : nextValue;
-  const formattedValue = new Intl.NumberFormat('en-IN', {
-    minimumFractionDigits: target.decimals,
-    maximumFractionDigits: target.decimals,
-  }).format(safeValue);
-
-  return `${target.prefix}${formattedValue}${target.suffix}`;
-}
-
-function AnimatedCount({
-  value,
-  start,
-  duration = 2500,
-}: {
-  value: string | number | null;
-  start: boolean;
-  duration?: number;
-}) {
-  const target = useMemo(() => parseCountTarget(value), [value]);
-  const staticDisplayValue = !target ? (value ? String(value) : '-') : !start ? formatCountValue(target, 0) : null;
-  const [displayValue, setDisplayValue] = useState(() => (target ? formatCountValue(target, start ? target.value : 0) : value ? String(value) : '-'));
-
-  useEffect(() => {
-    if (!target || !start) {
-      return;
-    }
-
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      const animationFrame = window.requestAnimationFrame(() => {
-        setDisplayValue(formatCountValue(target, target.value));
-      });
-
-      return () => window.cancelAnimationFrame(animationFrame);
-    }
-
-    let animationFrame = 0;
-    const animationStart = performance.now();
-
-    const tick = (now: number) => {
-      const progress = Math.min((now - animationStart) / duration, 1);
-      const easedProgress = 1 - Math.pow(1 - progress, 3);
-      const nextValue = target.value * easedProgress;
-
-      setDisplayValue(formatCountValue(target, progress >= 1 ? target.value : nextValue));
-
-      if (progress < 1) {
-        animationFrame = window.requestAnimationFrame(tick);
-      }
-    };
-
-    animationFrame = window.requestAnimationFrame(tick);
-
-    return () => window.cancelAnimationFrame(animationFrame);
-  }, [duration, start, target]);
-
-  return <>{staticDisplayValue ?? displayValue}</>;
-}
 
 function FadeIn({
   children,
@@ -470,298 +56,241 @@ function FadeIn({
   );
 }
 
-/* ---------------------------------------
-   Hero
-   --------------------------------------- */
+/* ═══════════════════════════════════════
+   Navbar
+   ═══════════════════════════════════════ */
 
-function Hero({ content }: { content: PageContent }) {
+function Navbar() {
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => {
+    const onResize = () => {
+      if (window.innerWidth >= 768) {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  const navItems = ['Features', 'X-Coin', 'How It Works', 'Impact'];
+
   return (
-    <section className='hero-section'>
-      <div className='hero-shell'>
-        <FadeIn>
-          <div className='hero-copy'>
-            <span className='badge hero-eyebrow'>
-              <Leaf style={{ width: 14, height: 14 }} /> {content.badge}
-            </span>
-            <h1 className='hero-title'>Measure your carbon footprint.</h1>
-            <p className='hero-subtitle'>Turn daily actions into measurable climate impact with a clean tracking, rewards, and reporting workflow built for real habits.</p>
-            <div className='hero-actions'>
-              <Link href={content.primaryHref} className='button-primary button-primary--large'>
-                <span>{content.primaryLabel}</span>
-                <ArrowRight style={{ width: 18, height: 18 }} />
-              </Link>
-              <Link href={content.secondaryHref} className='button-secondary button-primary--large'>
-                <span>{content.secondaryLabel}</span>
-              </Link>
-            </div>
-            <div className='hero-proof' aria-label='Carbon-X product highlights'>
-              <div className='hero-proof__item'>
-                <p className='hero-proof__value'>CO2</p>
-                <p className='hero-proof__label'>impact tracking</p>
-              </div>
-              <div className='hero-proof__item'>
-                <p className='hero-proof__value'>X-Coin</p>
-                <p className='hero-proof__label'>reward layer</p>
-              </div>
-              <div className='hero-proof__item'>
-                <p className='hero-proof__value'>Beta</p>
-                <p className='hero-proof__label'>testing now</p>
-              </div>
-            </div>
-          </div>
-        </FadeIn>
-
-        <FadeIn delay={0.12}>
-          <div className='dashboard-preview' aria-label='Carbon-X product dashboard preview'>
-            <div className='dashboard-frame'>
-              <div className='dashboard-toolbar'>
-                <p className='dashboard-toolbar__label'>Carbon-X Dashboard</p>
-                <p className='dashboard-toolbar__status'>Live beta</p>
-              </div>
-              <div className='dashboard-body'>
-                <div className='dashboard-featured'>
-                  <div>
-                    <p className='dashboard-label'>Carbon saved this week</p>
-                    <p className='dashboard-value'>150 kg</p>
-                    <p className='dashboard-note'>Tracked across walking, recycling, and lower-emission meals.</p>
-                  </div>
-                  <div className='mini-chart' aria-hidden='true'>
-                    {[42, 56, 48, 72, 64, 88, 76].map((height) => (
-                      <span key={height} style={{ height: `${height}%` }} />
-                    ))}
-                  </div>
-                </div>
-
-                <div className='dashboard-grid'>
-                  <div className='dashboard-metric'>
-                    <p className='metric-label'>Water saved</p>
-                    <p className='metric-value'>2.8K L</p>
-                    <p className='metric-note'>weekly estimate</p>
-                  </div>
-                  <div className='dashboard-metric'>
-                    <p className='metric-label'>Travel offset</p>
-                    <p className='metric-value'>82 km</p>
-                    <p className='metric-note'>car equivalent</p>
-                  </div>
-                  <div className='dashboard-metric'>
-                    <p className='metric-label'>Rewards</p>
-                    <p className='metric-value'>1,500</p>
-                    <p className='metric-note'>X-Coin earned</p>
-                  </div>
-                </div>
-
-                <div className='activity-card'>
-                  <span className='activity-icon'>
-                    <Activity style={{ width: 20, height: 20 }} />
-                  </span>
-                  <div>
-                    <p className='activity-label'>Recent action</p>
-                    <p className='activity-copy'>Logged a walk commute and avoided 1.8 kg CO2.</p>
-                  </div>
-                  <p className='activity-value'>+18 XP</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </FadeIn>
-      </div>
-    </section>
-  );
-}
-
-function InnerPageHero({ content }: { content: PageContent }) {
-  return (
-    <section className='section-shell section-shell--tight'>
-      <div className='section-inner'>
-        <FadeIn className='section-header section-header--center'>
-          <span className='badge'>
-            <Zap style={{ width: 14, height: 14 }} /> {content.badge}
+    <header
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 100,
+        transition: 'all 0.3s ease',
+        background: scrolled || mobileMenuOpen ? 'var(--nav-surface-solid)' : 'transparent',
+        backdropFilter: scrolled || mobileMenuOpen ? 'blur(20px) saturate(1.2)' : 'none',
+        borderBottom: scrolled || mobileMenuOpen ? '1px solid var(--border-subtle)' : 'none',
+        boxShadow: scrolled || mobileMenuOpen ? 'var(--nav-shadow)' : 'none',
+      }}
+    >
+      <nav className='site-nav'>
+        <div className='site-nav__brand'>
+          <Image src='/images/logo-v2.png' alt='CARBON-X' width={1225} height={835} style={{ height: 30, width: 'auto' }} />
+          <span style={{ fontSize: 18, fontWeight: 700, letterSpacing: 1 }} className='text-gradient'>
+            CARBON-X
           </span>
-          <h1 className='section-title' style={{ marginTop: 18 }}>{content.title} {content.accentTitle}</h1>
-          <p className='section-copy'>{content.description}</p>
-          <div className='cta-actions'>
-            <Link href={content.primaryHref} className='button-primary'>
-              <span>{content.primaryLabel}</span>
-            </Link>
-            <Link href={content.secondaryHref} className='button-secondary'>
-              <span>{content.secondaryLabel}</span>
-            </Link>
+        </div>
+
+        <div className='site-nav__desktop'>
+          <div className='site-nav__links'>
+            {navItems.map((item) => (
+              <a key={item} href={`#${item.toLowerCase().replace(/ /g, '-')}`} className='nav-link'>
+                {item}
+              </a>
+            ))}
           </div>
-        </FadeIn>
+          <a href='#beta' className='button-primary button-primary--compact'>
+            Beta Phase
+          </a>
+        </div>
+
+        <div className='site-nav__controls'>
+          <button
+            type='button'
+            className='site-nav__toggle'
+            aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+            aria-expanded={mobileMenuOpen}
+            onClick={() => setMobileMenuOpen((open) => !open)}
+          >
+            {mobileMenuOpen ? <X style={{ width: 20, height: 20 }} /> : <Menu style={{ width: 20, height: 20 }} />}
+          </button>
+        </div>
+      </nav>
+
+      <div className={`site-nav__mobile ${mobileMenuOpen ? 'is-open' : ''}`}>
+        {navItems.map((item) => (
+          <a
+            key={item}
+            href={`#${item.toLowerCase().replace(/ /g, '-')}`}
+            className='site-nav__mobile-link'
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            {item}
+          </a>
+        ))}
+        <a href='#beta' className='site-nav__mobile-cta button-primary' onClick={() => setMobileMenuOpen(false)}>
+          Beta Phase
+        </a>
       </div>
-    </section>
+    </header>
   );
 }
 
-function InnerPageStory({ content }: { content: PageContent }) {
+/* ═══════════════════════════════════════
+   Hero
+   ═══════════════════════════════════════ */
+
+function Hero() {
   return (
-    <section style={{ padding: '0 24px 72px' }}>
+    <section
+      className='hero-section'
+      style={{
+        position: 'relative',
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'flex-start',
+        justifyContent: 'center',
+        overflow: 'hidden',
+      }}
+    >
       <div
         style={{
-          maxWidth: 1120,
-          margin: '0 auto',
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-          gap: 26,
+          position: 'absolute',
+          inset: 0,
+          zIndex: 0,
+          pointerEvents: 'none',
         }}
       >
-        <FadeIn>
-          <div className='card' style={{ padding: '30px 28px', position: 'sticky', top: 110 }}>
-            <p
-              style={{
-                fontSize: 12,
-                fontWeight: 700,
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-                color: 'var(--accent-teal)',
-                marginBottom: 12,
-              }}
-            >
-              {content.overviewEyebrow}
-            </p>
-            <h2 style={{ fontSize: 'clamp(28px, 4vw, 40px)', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: 16 }}>
-              {content.overviewTitle}
-            </h2>
-            <p style={{ fontSize: 15, lineHeight: 1.85, color: 'var(--text-secondary)', marginBottom: 22 }}>
-              {content.overviewIntro}
-            </p>
-            <div style={{ display: 'grid', gap: 12 }}>
-              {content.pillars.map((pillar) => (
-                <div
-                  key={pillar.title}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: 10,
-                    padding: '10px 0',
-                    borderTop: '1px solid var(--border-subtle)',
-                  }}
-                >
-                  <Check style={{ width: 16, height: 16, color: 'var(--accent-green)', marginTop: 4, flexShrink: 0 }} />
-                  <span style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.7 }}>{pillar.title}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </FadeIn>
-
-        <div style={{ display: 'grid', gap: 18 }}>
-          {content.overviewParagraphs.map((paragraph, index) => (
-            <FadeIn key={paragraph} delay={index * 0.06}>
-              <article className='card glow' style={{ padding: '30px 28px' }}>
-                <p style={{ fontSize: 15, lineHeight: 1.9, color: 'var(--text-secondary)', margin: 0 }}>{paragraph}</p>
-              </article>
-            </FadeIn>
-          ))}
-        </div>
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload='auto'
+          aria-hidden='true'
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            objectPosition: 'center center',
+          }}
+        >
+          <source src='/hero.mp4' type='video/mp4' />
+        </video>
       </div>
-    </section>
-  );
-}
+      <div
+        className='hero-section__overlay'
+        style={{
+          position: 'absolute',
+          inset: 0,
+          zIndex: 1,
+          pointerEvents: 'none',
+        }}
+      />
 
-function InnerPageFramework({ content }: { content: PageContent }) {
-  return (
-    <section style={{ padding: '0 24px 84px' }}>
-      <div style={{ maxWidth: 1120, margin: '0 auto' }}>
-        <FadeIn>
-          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16, alignItems: 'end', flexWrap: 'wrap', marginBottom: 30 }}>
-            <div>
-              <p
-                style={{
-                  fontSize: 12,
-                  fontWeight: 700,
-                  letterSpacing: '0.12em',
-                  textTransform: 'uppercase',
-                  color: 'var(--accent-gold)',
-                  marginBottom: 10,
-                }}
-              >
-                Highlights
-              </p>
-              <h2 style={{ fontSize: 'clamp(28px, 4vw, 40px)', fontWeight: 800, letterSpacing: '-0.03em', margin: 0 }}>
-                {content.pillarTitle}
-              </h2>
-            </div>
-            <p style={{ maxWidth: 480, fontSize: 15, lineHeight: 1.8, color: 'var(--text-secondary)', margin: 0 }}>
-              A shorter scan of the main points.
-            </p>
-          </div>
-        </FadeIn>
+      <div
+        className='hero-section__content'
+        style={{
+          position: 'relative',
+          zIndex: 10,
+          width: '100%',
+          maxWidth: 900,
+          margin: '0 auto',
+          textAlign: 'center',
+          padding: '0 24px',
+        }}
+      >
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <span className='badge' style={{ marginBottom: 32, display: 'inline-flex' }}>
+            <Zap style={{ width: 14, height: 14 }} /> Currently in beta testing phase
+          </span>
+        </motion.div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 18 }}>
-          {content.pillars.map((pillar, index) => (
-            <FadeIn key={pillar.title} delay={index * 0.06}>
-              <div className='card' style={{ padding: '28px 24px', height: '100%' }}>
-                <div
-                  style={{
-                    width: 38,
-                    height: 38,
-                    borderRadius: 12,
-                    background: 'color-mix(in srgb, var(--accent-green) 12%, transparent)',
-                    border: '1px solid color-mix(in srgb, var(--accent-green) 20%, transparent)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginBottom: 18,
-                    fontWeight: 800,
-                    color: 'var(--accent-green)',
-                  }}
-                >
-                  {index + 1}
-                </div>
-                <h3 style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-0.01em', marginBottom: 10 }}>{pillar.title}</h3>
-                <p style={{ fontSize: 15, color: 'var(--text-secondary)', lineHeight: 1.8, margin: 0 }}>{pillar.description}</p>
-              </div>
-            </FadeIn>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.15, ease }}
+          className='animate-float'
+          style={{ marginBottom: 32 }}
+        >
+          <Image src='/images/logo-v2.png' alt='CARBON-X' width={1225} height={835} style={{ margin: '0 auto', height: 80, width: 'auto' }} />
+        </motion.div>
 
-function InnerPageAnswers({ content }: { content: PageContent }) {
-  return (
-    <section style={{ padding: '0 24px 100px' }}>
-      <div style={{ maxWidth: 1120, margin: '0 auto' }}>
-        <FadeIn>
-          <div style={{ marginBottom: 28 }}>
-            <p
-              style={{
-                fontSize: 12,
-                fontWeight: 700,
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-                color: 'var(--accent-teal)',
-                marginBottom: 10,
-              }}
-            >
-              Key questions
-            </p>
-            <h2 style={{ fontSize: 'clamp(28px, 4vw, 40px)', fontWeight: 800, letterSpacing: '-0.03em', margin: 0 }}>
-              {content.answersTitle}
-            </h2>
-          </div>
-        </FadeIn>
+        <motion.h1
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.25, ease }}
+          style={{
+            fontSize: 'clamp(42px, 7vw, 80px)',
+            fontWeight: 800,
+            lineHeight: 1.05,
+            letterSpacing: '-0.03em',
+            marginBottom: 24,
+          }}
+        >
+          Track your carbon.
+          <br />
+          <span className='text-gradient'>Save the planet.</span>
+        </motion.h1>
 
-        <div style={{ display: 'grid', gap: 16 }}>
-          {content.answers.map((item, index) => (
-            <FadeIn key={item.question} delay={index * 0.05}>
-              <div
-                className='card glow'
-                style={{
-                  padding: '24px 26px',
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-                  gap: 22,
-                }}
-              >
-                <h3 style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-0.01em', margin: 0 }}>{item.question}</h3>
-                <p style={{ fontSize: 15, lineHeight: 1.85, color: 'var(--text-secondary)', margin: 0 }}>{item.answer}</p>
-              </div>
-            </FadeIn>
-          ))}
-        </div>
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.4, ease }}
+          style={{
+            fontSize: 18,
+            lineHeight: 1.7,
+            color: 'var(--text-secondary)',
+            maxWidth: 560,
+            margin: '0 auto 40px',
+          }}
+        >
+          The personal carbon tracker that makes sustainability simple.
+          Log eco&#8209;actions, watch your impact grow, earn rewards — and help
+          heal the planet, one bit at a time.
+        </motion.p>
+
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.55, ease }}
+          style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}
+        >
+          <a href='#beta' className='button-primary'>
+            Beta details <ArrowRight style={{ width: 18, height: 18 }} />
+          </a>
+          <a href='#features' className='button-secondary'>
+            See features
+          </a>
+        </motion.div>
+
+        {/* Scroll hint */}
+        <motion.div
+          style={{ marginTop: 56, display: 'flex', justifyContent: 'center' }}
+          animate={{ y: [0, 8, 0] }}
+          transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          <ChevronDown style={{ width: 22, height: 22, color: 'var(--text-muted)' }} />
+        </motion.div>
       </div>
     </section>
   );
@@ -771,48 +300,29 @@ function InnerPageAnswers({ content }: { content: PageContent }) {
    Logos / Social Proof
    ═══════════════════════════════════════ */
 
-function PagePillars({ content }: { content: PageContent }) {
-  return (
-    <section className='section-shell'>
-      <div className='section-inner why-layout'>
-        <FadeIn className='why-panel'>
-          <p className='section-kicker'>Why it matters</p>
-          <h2 className='section-title'>{content.pillarTitle}</h2>
-          <p className='section-copy'>
-            Climate products earn trust when they make impact easy to understand, repeat, and verify.
-          </p>
-        </FadeIn>
+function SocialProof() {
+  const metrics = [
+    { value: '2.4M', label: 'kg CO₂ tracked' },
+    { value: '18K+', label: 'Active users' },
+    { value: '156', label: 'Countries' },
+    { value: '4.8', label: 'App rating', suffix: '★' },
+  ];
 
-        <div className='why-grid'>
-          {content.pillars.map((pillar, index) => (
-            <FadeIn key={pillar.title} delay={index * 0.08}>
-              <div className='why-card'>
-                <span className='why-icon'>
-                  <Check style={{ width: 19, height: 19 }} />
-                </span>
-                <div>
-                  <h3 className='why-title'>{pillar.title}</h3>
-                  <p className='why-copy'>{pillar.description}</p>
-                </div>
-              </div>
-            </FadeIn>
-          ))}
-          <FadeIn delay={content.pillars.length * 0.08}>
-            <div className='why-card'>
-              <span className='why-icon'>
-                <Shield style={{ width: 19, height: 19 }} />
-              </span>
-              <div>
-                <h3 className='why-title'>Product-ready foundation</h3>
-                <p className='why-copy'>The beta is structured around clear reporting, habit retention, and a calm user experience.</p>
-              </div>
-            </div>
-          </FadeIn>
+  void metrics;
+
+  return (
+    <section className='social-proof-section' style={{ padding: '60px 24px' }}>
+      <FadeIn>
+        <div style={{ maxWidth: 960, margin: '0 auto', textAlign: 'center' }}>
+          <p style={{ fontSize: 'clamp(24px, 4vw, 40px)', fontWeight: 800, letterSpacing: '-0.02em' }} className='text-gradient'>
+            150+kg of CO2 emissions saved in the last 1 week
+          </p>
         </div>
-      </div>
+      </FadeIn>
     </section>
   );
 }
+
 /* ═══════════════════════════════════════
    Features
    ═══════════════════════════════════════ */
@@ -820,49 +330,81 @@ function PagePillars({ content }: { content: PageContent }) {
 const features = [
   {
     icon: Target,
-    title: 'Action Tracking',
-    desc: 'Log sustainable choices in seconds.',
+    title: 'Smart Action Tracking',
+    desc: 'Log eco-friendly actions in seconds. Walk, eat plant-based, recycle — each precisely measured in CO₂ savings.',
     color: '#4ade80',
   },
   {
     icon: BarChart3,
     title: 'Impact Analytics',
-    desc: 'See carbon savings and trends clearly.',
+    desc: 'Beautiful charts show weekly, monthly, and lifetime carbon reduction. Know exactly how your habits map to real change.',
     color: '#2dd4bf',
   },
   {
     icon: Flame,
-    title: 'Streaks',
-    desc: 'Use XP and milestones to stay consistent.',
+    title: 'Streaks & Gamification',
+    desc: 'Build daily streaks, earn XP, climb from Climate Rookie to Earth Guardian. Compete on global leaderboards.',
     color: '#22d3ee',
+  },
+  {
+    icon: Leaf,
+    title: 'AI-Powered Insights',
+    desc: 'Personalized recommendations based on your lifestyle. Our AI surfaces the highest-impact actions for you.',
+    color: '#4ade80',
+  },
+  {
+    icon: Users,
+    title: 'Community Challenges',
+    desc: 'Join global challenges, team up with friends, see collective impact grow in real-time across your city.',
+    color: '#2dd4bf',
   },
   {
     icon: Shield,
     title: 'Privacy First',
-    desc: 'Keep user activity protected by design.',
-    color: '#4ade80',
+    desc: 'End-to-end encryption, no third-party data sales, full GDPR compliance. Your data stays yours.',
+    color: '#22d3ee',
   },
 ];
 
 function Features() {
   return (
-    <section id='features' className='section-shell feature-section'>
-      <div className='section-inner'>
-        <FadeIn className='section-header'>
-          <p className='section-kicker'>Product features</p>
-          <h2 className='section-title'>Designed for fast, trustworthy climate tracking.</h2>
-          <p className='section-copy'>A focused feature set for logging actions, understanding outcomes, and keeping users engaged without visual noise.</p>
+    <section id='features' className='feature-section' style={{ padding: '120px 24px' }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+        <FadeIn>
+          <div style={{ textAlign: 'center', marginBottom: 64 }}>
+            <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#4ade80', marginBottom: 12 }}>
+              Features
+            </p>
+            <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: 16 }}>
+              Everything you need to <span className='text-gradient'>make an impact</span>
+            </h2>
+            <p style={{ fontSize: 16, color: 'var(--text-secondary)', maxWidth: 520, margin: '0 auto' }}>
+              Cutting-edge tech meets behavioral science to make sustainability effortless and engaging.
+            </p>
+          </div>
         </FadeIn>
 
-        <div className='feature-grid'>
-          {features.map((feature, index) => (
-            <FadeIn key={feature.title} delay={index * 0.06}>
-              <div className='feature-card'>
-                <span className='feature-icon'>
-                  <feature.icon style={{ width: 20, height: 20 }} />
-                </span>
-                <h3 className='feature-title'>{feature.title}</h3>
-                <p className='feature-copy'>{feature.desc}</p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 20 }}>
+          {features.map((f, i) => (
+            <FadeIn key={f.title} delay={i * 0.06}>
+              <div className='card glow' style={{ padding: '36px 32px', height: '100%' }}>
+                <div
+                  style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: 12,
+                    background: `${f.color}12`,
+                    border: `1px solid ${f.color}20`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginBottom: 20,
+                  }}
+                >
+                  <f.icon style={{ width: 22, height: 22, color: f.color }} />
+                </div>
+                <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 10, letterSpacing: '-0.01em' }}>{f.title}</h3>
+                <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.7 }}>{f.desc}</p>
               </div>
             </FadeIn>
           ))}
@@ -877,31 +419,69 @@ function Features() {
    ═══════════════════════════════════════ */
 
 const steps = [
-  { icon: Activity, title: 'Log Actions', desc: 'Add eco-actions quickly.' },
-  { icon: TrendingUp, title: 'See Impact', desc: 'Track CO2 savings.' },
-  { icon: Award, title: 'Earn X-Coin', desc: 'Build rewards as you go.' },
+  { icon: Mail, title: 'Join the Beta', desc: 'Register your interest and get early access updates as new testing spots open.' },
+  { icon: Activity, title: 'Log Your Actions', desc: 'Tap to log walking, recycling, plant meals — any sustainable action.' },
+  { icon: TrendingUp, title: 'Watch Your Impact', desc: 'See CO₂ savings grow. Track equivalents in trees planted and km offset.' },
+  { icon: Award, title: 'Level Up & Lead', desc: 'Earn XP, unlock achievements, climb leaderboards. Make sustainability fun.' },
 ];
 
 function HowItWorks() {
   return (
-    <section id='how-it-works' className='section-shell steps-section'>
-      <div className='section-inner'>
-        <FadeIn className='section-header section-header--center'>
-          <p className='section-kicker'>How it works</p>
-          <h2 className='section-title'>A simple loop for measurable climate habits.</h2>
-          <p className='section-copy'>Carbon-X keeps the experience focused: log an action, understand the result, and build progress over time.</p>
+    <section id='how-it-works' className='steps-section' style={{ padding: '120px 24px' }}>
+      <div style={{ maxWidth: 960, margin: '0 auto' }}>
+        <FadeIn>
+          <div style={{ textAlign: 'center', marginBottom: 64 }}>
+            <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#2dd4bf', marginBottom: 12 }}>
+              How It Works
+            </p>
+            <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)', fontWeight: 800, letterSpacing: '-0.03em' }}>
+              Start in <span className='text-gradient'>four simple steps</span>
+            </h2>
+          </div>
         </FadeIn>
 
-        <div className='step-grid'>
-          {steps.map((step, index) => (
-            <FadeIn key={step.title} delay={index * 0.08}>
-              <div className='step-card'>
-                <p className='step-number'>0{index + 1}</p>
-                <span className='step-icon'>
-                  <step.icon style={{ width: 21, height: 21 }} />
-                </span>
-                <h3 className='step-title'>{step.title}</h3>
-                <p className='step-copy'>{step.desc}</p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 32 }}>
+          {steps.map((s, i) => (
+            <FadeIn key={s.title} delay={i * 0.1}>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ position: 'relative', display: 'inline-flex', marginBottom: 24 }}>
+                  <div
+                    style={{
+                      width: 72,
+                      height: 72,
+                      borderRadius: 20,
+                      background: 'var(--bg-card)',
+                      border: '1px solid var(--border-subtle)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      position: 'relative',
+                    }}
+                  >
+                    <s.icon style={{ width: 28, height: 28, color: 'var(--accent-green)' }} />
+                  </div>
+                  <span
+                    style={{
+                      position: 'absolute',
+                      top: -8,
+                      right: -8,
+                      width: 26,
+                      height: 26,
+                      borderRadius: '50%',
+                      background: 'var(--brand-gradient)',
+                      color: 'var(--button-text)',
+                      fontSize: 11,
+                      fontWeight: 700,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    {i + 1}
+                  </span>
+                </div>
+                <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 8 }}>{s.title}</h3>
+                <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.6 }}>{s.desc}</p>
               </div>
             </FadeIn>
           ))}
@@ -917,21 +497,151 @@ function HowItWorks() {
 
 function XCoin() {
   return (
-    <section id='x-coin' className='section-shell impact-section'>
-      <div className='section-inner'>
-        <FadeIn className='reward-card'>
-          <div>
-            <p className='section-kicker'>X-Coin rewards</p>
-            <h2 className='section-title'>Reward the behavior, keep the impact clear.</h2>
-            <p className='section-copy'>X-Coin gives sustainable actions a visible value inside Carbon-X while keeping the experience grounded in impact.</p>
-            <div className='reward-conversion'>
-              <span>10 X-Coin</span>
-              <span>=</span>
-              <span>1 kg CO2 saved</span>
-            </div>
+    <section id='x-coin' className='impact-section' style={{ padding: '120px 24px' }}>
+      <div style={{ maxWidth: 1000, margin: '0 auto' }}>
+        <FadeIn>
+          <div style={{ textAlign: 'center', marginBottom: 32 }}>
+            <p
+              style={{
+                fontSize: 13,
+                fontWeight: 600,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                color: 'var(--accent-gold)',
+                marginBottom: 12,
+              }}
+            >
+              X-Coin
+            </p>
+            <h2 style={{ fontSize: 'clamp(30px, 4vw, 44px)', fontWeight: 800, letterSpacing: '-0.03em' }}>
+              Rewarding impact with <span className='text-gradient-warm'>every action</span>
+            </h2>
           </div>
-          <div className='coin-visual'>
-            <Image src='/images/coin.png' alt='X-Coin reward coin' width={180} height={180} style={{ width: '70%', height: 'auto', maxWidth: 180 }} />
+
+          <div
+            className='card glow'
+            style={{
+              padding: '36px 32px',
+              overflow: 'hidden',
+              position: 'relative',
+            }}
+          >
+            <div
+              style={{
+                position: 'absolute',
+                top: -80,
+                right: -40,
+                width: 240,
+                height: 240,
+                background: 'radial-gradient(circle, rgba(250,204,21,0.14) 0%, transparent 70%)',
+                pointerEvents: 'none',
+              }}
+            />
+
+            <div
+              className='coin-section__content'
+              style={{
+                position: 'relative',
+                zIndex: 1,
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                gap: 32,
+                alignItems: 'center',
+              }}
+            >
+              <div className='coin-section__text'>
+                <span
+                  className='badge'
+                  style={{
+                    marginBottom: 18,
+                    display: 'inline-flex',
+                    background: 'color-mix(in srgb, var(--accent-gold) 12%, transparent)',
+                    color: 'var(--accent-gold)',
+                    border: '1px solid color-mix(in srgb, var(--accent-gold) 24%, transparent)',
+                  }}
+                >
+                  X-Coin
+                </span>
+
+                <h3
+                  style={{
+                    fontSize: 'clamp(28px, 3.5vw, 40px)',
+                    fontWeight: 800,
+                    letterSpacing: '-0.03em',
+                    lineHeight: 1.1,
+                    marginBottom: 14,
+                  }}
+                >
+                  Turn every eco action into <span className='text-gradient-warm'>measurable value</span>
+                </h3>
+
+                <p style={{ fontSize: 16, lineHeight: 1.75, color: 'var(--text-secondary)', marginBottom: 18 }}>
+                  X-Coin rewards users for building better climate habits. Each action you log contributes to a
+                  transparent coin balance that reflects the real-world impact you are creating over time.
+                </p>
+
+                <div
+                  className='coin-section__conversion'
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    padding: '12px 18px',
+                    borderRadius: 999,
+                    background: 'color-mix(in srgb, var(--accent-gold) 12%, transparent)',
+                    border: '1px solid color-mix(in srgb, var(--accent-gold) 24%, transparent)',
+                    color: 'var(--accent-gold-strong)',
+                    fontSize: 15,
+                    fontWeight: 700,
+                    marginBottom: 20,
+                    flexWrap: 'nowrap',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  <span>10 X-COIN</span>
+                  <span style={{ color: 'var(--text-muted)' }}>=</span>
+                  <span>1 kg of CO2 emissions saved</span>
+                </div>
+
+                <div style={{ display: 'grid', gap: 12 }}>
+                  <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.7 }}>
+                    Track progress in a format users can understand instantly, while reinforcing how small daily
+                    actions add up to meaningful emissions reduction.
+                  </p>
+                  <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.7 }}>
+                    The X-Coin system gives Carbon-X a clear incentive layer that is simple, credible, and easy to grow
+                    into future rewards, campaigns, and partner programs.
+                  </p>
+                </div>
+              </div>
+
+              <div className='coin-section__media' style={{ display: 'flex', justifyContent: 'center' }}>
+                <div
+                  style={{
+                    width: 'min(100%, 340px)',
+                    aspectRatio: '1 / 1',
+                    borderRadius: 28,
+                    background:
+                      'linear-gradient(180deg, color-mix(in srgb, var(--accent-gold) 14%, transparent) 0%, color-mix(in srgb, var(--surface-strong) 42%, transparent) 100%)',
+                    border: '1px solid var(--border-subtle)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: 24,
+                    boxShadow: '0 24px 60px color-mix(in srgb, var(--accent-gold) 16%, transparent)',
+                  }}
+                >
+                  <Image
+                    src='/images/coin.png'
+                    alt='X-Coin'
+                    width={260}
+                    height={260}
+                    className='animate-float'
+                    style={{ width: '100%', height: 'auto', maxWidth: 260 }}
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </FadeIn>
       </div>
@@ -939,22 +649,14 @@ function XCoin() {
   );
 }
 
-function Impact({ constants }: { constants: SiteConstants }) {
-  const impactSectionRef = useRef<HTMLElement | null>(null);
-  const [hasTriggeredCountUp, setHasTriggeredCountUp] = useState(false);
-  const annualTreeAbsorptionKg = 21;
-  const kgValue = Number.parseFloat(constants.kg.replace(/,/g, ''));
-  const treeEquivalent = Number.isFinite(kgValue) ? kgValue / annualTreeAbsorptionKg : null;
-  const roundedTreeEquivalent = treeEquivalent !== null ? Math.max(1, Math.round(treeEquivalent)) : null;
-  const exactTreeEquivalent =
-    treeEquivalent !== null
-      ? new Intl.NumberFormat('en-IN', { maximumFractionDigits: 1 }).format(treeEquivalent)
-      : null;
+function Impact() {
   const impacts = [
+    { icon: TreePine, value: '12,847', label: 'Trees equivalent CO₂ absorbed', color: '#4ade80' },
+    { icon: Droplets, value: '12+', label: 'Liters of water conserved', color: '#2dd4bf' },
+    { icon: Wind, value: '180+', label: 'km of car travel offset', color: '#22d3ee' },
     {
-      id: 'top',
       icon: Leaf,
-      value: constants.kg,
+      value: '150+',
       label: (
         <>
           kg of CO<sub>2</sub> emissions saved in the last 1 week
@@ -962,118 +664,45 @@ function Impact({ constants }: { constants: SiteConstants }) {
       ),
       color: '#34d399',
     },
-    {
-      id: 'left',
-      icon: Droplets,
-      value: constants.liter,
-      label: 'Liters of water conserved',
-      color: '#2dd4bf',
-    },
-    {
-      id: 'right',
-      icon: Wind,
-      value: constants.km,
-      label: 'km of car travel offset',
-      color: '#22d3ee',
-    },
   ];
 
-  const visibleImpacts = impacts.filter((item) => item.value && item.value.trim().length > 0);
-
-  useEffect(() => {
-    const section = impactSectionRef.current;
-
-    if (!section || hasTriggeredCountUp) {
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry?.isIntersecting) {
-          return;
-        }
-
-        setHasTriggeredCountUp(true);
-        observer.disconnect();
-      },
-      {
-        threshold: 0.35,
-      }
-    );
-
-    observer.observe(section);
-
-    return () => observer.disconnect();
-  }, [hasTriggeredCountUp]);
+  const visibleImpacts = impacts.slice(1);
 
   return (
-    <section ref={impactSectionRef} id='impact' className='section-shell impact-section'>
+    <section id='impact' className='impact-section' style={{ padding: '120px 24px' }}>
       <div className='impact-section__inner'>
-        <FadeIn className='section-header section-header--center'>
-          <p className='section-kicker'>Key impact metrics</p>
-          <h2 className='section-title'>A cleaner view of climate progress.</h2>
-          <p className='section-copy'>One featured nature equivalent supported by the core metrics users need to scan quickly.</p>
+        <FadeIn>
+          <div style={{ textAlign: 'center', marginBottom: 64 }}>
+            <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--accent-teal)', marginBottom: 12 }}>
+              Our Collective Impact
+            </p>
+            <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)', fontWeight: 800, letterSpacing: '-0.03em' }}>
+              Together we&apos;re making a <span className='text-gradient'>real difference</span>
+            </h2>
+          </div>
         </FadeIn>
 
-        <div className='impact-orbit'>
-          <div className='impact-orbit__cluster'>
-            {visibleImpacts.map((item) => (
-              <div key={item.id} className={`impact-orbit__item impact-orbit__item--${item.id}`}>
-                <div className='card impact-card impact-card--orbit'>
-                  <div
-                    className='impact-card__icon-shell'
-                    style={{
-                      color: item.color,
-                      borderColor: `${item.color}40`,
-                      background: `linear-gradient(180deg, ${item.color}1f 0%, ${item.color}0d 100%)`,
-                    }}
-                  >
-                    <item.icon style={{ width: 28, height: 28 }} />
-                  </div>
-                  <p className='impact-card__kicker'>Live impact</p>
-                  <div className='impact-card__value text-gradient'>
-                    <AnimatedCount value={item.value} start={hasTriggeredCountUp} />
-                  </div>
-                  <p className='impact-card__label'>{item.label}</p>
+        <div className='impact-grid'>
+          {visibleImpacts.map((item, i) => (
+            <FadeIn key={item.value} delay={i * 0.1} className='impact-grid__item'>
+              <div
+                className='card impact-card'
+                style={{
+                  padding: '48px 32px',
+                  textAlign: 'center',
+                  boxShadow: `0 0 60px ${item.color}08`,
+                }}
+              >
+                <item.icon style={{ width: 36, height: 36, color: item.color, margin: '0 auto 20px' }} />
+                <div style={{ fontSize: 'clamp(36px, 5vw, 52px)', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: 8 }} className='text-gradient'>
+                  {item.value}
                 </div>
+                <p style={{ fontSize: 14, color: 'var(--text-muted)', fontWeight: 500 }}>{item.label}</p>
               </div>
-            ))}
-          </div>
-          <div className='impact-orbit__main'>
-            <div
-              className='card impact-card impact-card--tree impact-card--tree-orbit'
-            >
-              <div className='impact-card__tree-header'>
-                <div>
-                  <p className='impact-card__eyebrow'>Nature Equivalent</p>
-                  <h3 className='impact-card__title'>Equivalent trees planted</h3>
-                </div>
-                <div className='impact-card__tree-icon'>
-                  <TreePine style={{ width: 32, height: 32, color: '#34d399' }} />
-                </div>
-              </div>
-
-              <div className='impact-card__tree-body'>
-                <div>
-                  <div className='impact-card__tree-value text-gradient'>
-                    <AnimatedCount value={roundedTreeEquivalent} start={hasTriggeredCountUp} />
-                  </div>
-                  <p className='impact-card__tree-label'>Annual CO<sub>2</sub> absorption equivalent</p>
-                </div>
-
-                <div className='impact-card__tree-meta'>
-                  <p style={{ margin: 0 }}>
-                    Based on <strong>{constants.kg || '—'} kg CO<sub>2</sub></strong> saved and an estimate of{' '}
-                    <strong>21 kg per mature tree each year</strong>.
-                  </p>
-                  <p style={{ margin: 0, color: 'var(--text-primary)', fontWeight: 600 }}>
-                    {exactTreeEquivalent ? `≈ ${exactTreeEquivalent} trees per year equivalent` : 'Tree equivalent appears once CO2 data is available.'}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+            </FadeIn>
+          ))}
         </div>
+
       </div>
     </section>
   );
@@ -1083,78 +712,83 @@ function Impact({ constants }: { constants: SiteConstants }) {
    CTA
    ═══════════════════════════════════════ */
 
-const leadershipProfiles = [
-  {
-    featured: true,
-    role: 'Founder & Lead Developer',
-    name: 'Arman Khan',
-    image: '/images/team/arman-khan.svg',
-    summary: 'Leads product vision, strategy, and core Carbon-X development.',
-  },
-  {
-    featured: false,
-    role: 'Lead Web Developer',
-    name: 'Abishrant Shandilya',
-    image: '/images/team/abishrant-shandilya.svg',
-    summary: 'Builds the web experience, interface system, and responsive product polish.',
-  },
-] as const;
-
-const footerNavigation = [
-  { label: 'Home', href: '/' },
-  { label: 'About Us', href: '/about' },
-  { label: 'Features', href: '/features' },
-  { label: 'Impact', href: '/impact' },
-  { label: 'Beta Phase', href: '/beta' },
-] as const;
-
-function TeamSection() {
-  return (
-    <section className='section-shell'>
-      <div className='section-inner'>
-        <FadeIn className='section-header section-header--center'>
-          <p className='section-kicker'>Team</p>
-          <h2 className='section-title'>The people building Carbon-X.</h2>
-          <p className='section-copy'>A focused product and engineering team shaping the beta experience.</p>
-        </FadeIn>
-
-        <div className='feature-grid'>
-          {leadershipProfiles.map((profile, index) => (
-            <FadeIn key={profile.name} delay={index * 0.08}>
-              <div className='feature-card'>
-                <div style={{ width: 88, height: 88, borderRadius: 18, overflow: 'hidden', border: '1px solid var(--border-subtle)', marginBottom: 18 }}>
-                  <Image src={profile.image} alt={profile.name} width={88} height={88} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                </div>
-                <p className='section-kicker' style={{ marginBottom: 8 }}>{profile.role}</p>
-                <h3 className='feature-title'>{profile.name}</h3>
-                <p className='feature-copy'>{profile.summary}</p>
-              </div>
-            </FadeIn>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
 function BetaPhase() {
   return (
-    <section className='cta-section' id='beta'>
+    <section
+      className='cta-section'
+      id='beta'
+      style={{
+        padding: '120px 24px',
+        position: 'relative',
+        overflow: 'hidden',
+      }}
+    >
+      {/* Glow background */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: 600,
+          height: 400,
+          background: 'radial-gradient(circle, var(--hero-orb-primary) 0%, transparent 70%)',
+          pointerEvents: 'none',
+        }}
+      />
+
       <FadeIn>
-        <div className='cta-card'>
-          <span className='badge'>
-            <Zap style={{ width: 14, height: 14 }} /> Beta testing
+        <div style={{ maxWidth: 640, margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 10 }}>
+          <span className='badge' style={{ marginBottom: 24, display: 'inline-flex' }}>
+            <Zap style={{ width: 14, height: 14 }} /> Currently in beta testing phase
           </span>
-          <h2 className='section-title' style={{ marginTop: 18 }}>Build lower-carbon habits with clearer data.</h2>
-          <p className='section-copy' style={{ maxWidth: 640, marginLeft: 'auto', marginRight: 'auto' }}>
-            Carbon-X is being refined in beta before public release. Join the product journey and follow launch updates.
+
+          <Image
+            src='/images/logo-v2.png'
+            alt='CARBON-X'
+            width={1225}
+            height={835}
+            className='animate-float'
+            style={{ margin: '0 auto 28px', height: 64, width: 'auto' }}
+          />
+
+          <h2
+            className='beta-phase__title'
+            style={{
+              fontSize: 'clamp(32px, 5vw, 52px)',
+              fontWeight: 800,
+              letterSpacing: '-0.03em',
+              marginBottom: 16,
+            }}
+          >
+            <span className='beta-phase__title-line'>
+              <span>Carbon-X is</span>
+            </span>
+            <span className='beta-phase__title-line'>
+              <span className='text-gradient'>currently in beta phase</span>
+            </span>
+          </h2>
+
+          <p style={{ fontSize: 16, color: 'var(--text-secondary)', marginBottom: 36, lineHeight: 1.7 }}>
+            We are actively testing the product experience, impact tracking, and reward system before the public
+            release. There is no app download available yet.
           </p>
-          <div className='cta-actions'>
-            <Link href='/beta' className='button-primary button-primary--large'>
-              <span>View beta phase</span>
-              <ArrowRight style={{ width: 18, height: 18 }} />
-            </Link>
-            <Link href='/features' className='button-secondary button-primary--large'>Explore features</Link>
+
+          <div className='beta-phase__list'>
+            {[
+              'Core flows are being validated with test users.',
+              'Reward mechanics and impact scoring are still being tuned.',
+              'Public launch details will follow after beta feedback.',
+            ].map((item) => (
+              <div key={item} className='card beta-phase__card' style={{ padding: '20px 18px', lineHeight: 1.6, color: 'var(--text-secondary)' }}>
+                {item}
+              </div>
+            ))}
           </div>
+
+          {/*
+            Free · No credit card · Available on Play Store
+          */}
         </div>
       </FadeIn>
     </section>
@@ -1169,80 +803,42 @@ function Footer() {
   return (
     <footer className='site-footer'>
       <div className='site-footer__inner'>
-        <div className='site-footer__hero'>
-          <span className='site-footer__eyebrow'>Climate technology platform</span>
-          <div className='site-footer__brand'>
-            <Image src='/images/logo-v2.png' alt='CARBON-X' width={1225} height={835} style={{ height: 34, width: 'auto' }} />
-            <span className='site-footer__brand-name'>CARBON-X</span>
-          </div>
-          <p className='site-footer__lead'>
-            Track carbon-conscious habits and see the impact build.
-          </p>
-          <p className='site-footer__tagline'>
+        <div className='site-footer__brand'>
+          <Image src='/images/logo-v2.png' alt='CARBON-X' width={1225} height={835} style={{ height: 24, width: 'auto' }} />
+          <span style={{ fontSize: 14, fontWeight: 600, letterSpacing: 0.5 }} className='text-gradient'>
+            CARBON-X
+          </span>
+          <span className='site-footer__tagline' style={{ fontSize: 12, color: 'var(--text-muted)' }}>
             Healing the Planet, One Bit at a Time.
-          </p>
+          </span>
         </div>
 
-        <div className='site-footer__grid'>
-          <div className='site-footer__column'>
-            <p className='site-footer__heading'>Connect</p>
-            <div className='site-footer__actions'>
-              <a
-                href='https://www.instagram.com/carbonx.in?igsh=cW5uMnk0M2ZraWdt'
-                target='_blank'
-                rel='noreferrer'
-                className='site-footer__link-item'
-              >
-                <Instagram style={{ width: 16, height: 16 }} />
-                <span className='site-footer__link-text'>Instagram</span>
-              </a>
-              <a
-                href='mailto:connect.carbonx@outlook.com'
-                className='site-footer__link-item'
-              >
-                <Mail style={{ width: 16, height: 16 }} />
-                <span className='site-footer__link-text'>connect.carbonx@outlook.com</span>
-              </a>
-            </div>
+        <div className='site-footer__links' style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+          <div className='site-footer__actions'>
+            <a
+              href='https://www.instagram.com/carbonx.in?igsh=cW5uMnk0M2ZraWdt'
+              target='_blank'
+              rel='noreferrer'
+              className='site-footer__link-item'
+              style={{ color: 'inherit', textDecoration: 'none' }}
+            >
+              <Instagram style={{ width: 16, height: 16 }} />
+              <span className='site-footer__link-text'>Instagram</span>
+            </a>
+            <a
+              href='mailto:carbonxarman@gmail.com'
+              className='site-footer__link-item'
+              style={{ color: 'inherit', textDecoration: 'none' }}
+            >
+              <Mail style={{ width: 16, height: 16 }} />
+              <span className='site-footer__link-text'>carbonxarman@gmail.com</span>
+            </a>
           </div>
 
-          <div className='site-footer__column'>
-            <p className='site-footer__heading'>Navigation</p>
-            <div className='site-footer__menu'>
-              {footerNavigation.map((item) => (
-                <Link key={item.href} href={item.href} className='site-footer__menu-link'>
-                  {item.label}
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          <div className='site-footer__column'>
-            <p className='site-footer__heading'>Developers</p>
-            <div className='site-footer__team'>
-              {leadershipProfiles.map((profile) => (
-                <div key={profile.name} className='site-footer__team-card'>
-                  <div className='site-footer__team-copy'>
-                    <p className='site-footer__team-name'>{profile.name}</p>
-                    <p className='site-footer__team-role'>{profile.role}</p>
-                  </div>
-                  <span className='site-footer__team-linkedin' aria-label={`${profile.name} LinkedIn`}>
-                    <Linkedin style={{ width: 16, height: 16 }} />
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className='site-footer__bottom'>
           <div className='site-footer__legal'>
-            <a href='#' className='site-footer__text-link'>Privacy</a>
-            <a href='#' className='site-footer__text-link'>Terms</a>
-            <span>&copy; {new Date().getFullYear()} CARBON-X</span>
-          </div>
-          <div className='site-footer__bottom-note'>
-            Designed for a climate-first digital future.
+            <a href='#' className='site-footer__text-link' style={{ color: 'inherit', textDecoration: 'none' }}>Privacy</a>
+            <a href='#' className='site-footer__text-link' style={{ color: 'inherit', textDecoration: 'none' }}>Terms</a>
+            <span>&copy; {new Date().getFullYear()}</span>
           </div>
         </div>
       </div>
@@ -1254,92 +850,31 @@ function Footer() {
    Page
    ═══════════════════════════════════════ */
 
-export function MarketingSite({ page = 'home' }: { page?: MarketingSitePage }) {
-  const [siteConstants, setSiteConstants] = useState<SiteConstants>(EMPTY_SITE_CONSTANTS);
-
+export default function Home() {
   useEffect(() => {
-    const unsubscribe = subscribeToSiteConstants(
-      (constants) => {
-        setSiteConstants(constants);
-      },
-      () => {
-        setSiteConstants(EMPTY_SITE_CONSTANTS);
-      }
-    );
-
-    return () => unsubscribe();
+    document.documentElement.dataset.theme = 'dark';
+    document.documentElement.style.colorScheme = 'dark';
+    window.localStorage.removeItem('carbonx-theme');
   }, []);
-
-  const isHomePage = page === 'home';
-  const content = pageContent[page];
 
   return (
     <>
-      <SiteNavbar />
+      <div className='noise' />
+      <Navbar />
       <main className='page-shell'>
-        {isHomePage ? <Hero content={content} /> : <InnerPageHero content={content} />}
-        {page === 'home' ? (
-          <>
-            <HowItWorks />
-            <Impact constants={siteConstants} />
-            <Features />
-            <XCoin />
-            <PagePillars content={content} />
-            <BetaPhase />
-          </>
-        ) : null}
-        {page === 'about' ? (
-          <>
-            <InnerPageStory content={content} />
-            <TeamSection />
-          </>
-        ) : null}
-        {page === 'features' ? (
-          <>
-            <InnerPageFramework content={content} />
-          </>
-        ) : null}
-        {page === 'x-coin' ? (
-          <>
-            <XCoin />
-          </>
-        ) : null}
-        {page === 'how-it-works' ? (
-          <>
-            <HowItWorks />
-          </>
-        ) : null}
-        {page === 'impact' ? (
-          <>
-            <Impact constants={siteConstants} />
-          </>
-        ) : null}
-        {page === 'beta' ? (
-          <>
-            <BetaPhase />
-            <InnerPageAnswers content={content} />
-          </>
-        ) : null}
+        <Hero />
+        <Features />
+        <div className='section-divider' />
+        <XCoin />
+        <div className='section-divider' />
+        <HowItWorks />
+        <div className='section-divider' />
+        <Impact />
+        <BetaPhase />
       </main>
       <Footer />
     </>
   );
 }
-
-export default function Home() {
-  return <MarketingSite page='home' />;
-}
-
-
-
-
-
-
-
-
-
-
-
-
 
 
